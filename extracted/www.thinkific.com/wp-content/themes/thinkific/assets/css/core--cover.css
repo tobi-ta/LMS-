@@ -1,0 +1,289 @@
+.wp-block-cover {
+    --tick-line-stroke: #716a5c7a
+}
+
+.wp-block-cover.is-style-tick-circle-left .wp-block-cover__inner-container,
+.wp-block-cover.is-style-tick-circle-middle .wp-block-cover__inner-container,
+.wp-block-cover.is-style-tick-circle-middle-large .wp-block-cover__inner-container,
+.wp-block-cover.is-style-tick-circle-right .wp-block-cover__inner-container,
+.wp-block-cover.is-style-tick-circle-rotate .wp-block-cover__inner-container,
+.wp-block-cover.is-style-tick-circle-top .wp-block-cover__inner-container,
+.wp-block-cover.is-style-tick-linear-both-sides .wp-block-cover__inner-container,
+.wp-block-cover.is-style-tick-linear-left .wp-block-cover__inner-container,
+.wp-block-cover.is-style-tick-linear-right .wp-block-cover__inner-container {
+    z-index: 3 !important
+}
+
+.wp-block-cover.is-style-tick-linear-both-sides:after,
+.wp-block-cover.is-style-tick-linear-both-sides:before,
+.wp-block-cover.is-style-tick-linear-left:before,
+.wp-block-cover.is-style-tick-linear-right:before {
+    background-image: repeating-linear-gradient(to bottom, var(--tick-line-stroke) 0, var(--tick-line-stroke) 1px, transparent 1px, transparent 20px);
+    content: "";
+    height: 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    width: 15%;
+    z-index: 2
+}
+
+@media(max-width:calc(1024px - 0.02px)) {
+    .wp-block-cover.is-style-tick-linear-both-sides:after,
+    .wp-block-cover.is-style-tick-linear-both-sides:before,
+    .wp-block-cover.is-style-tick-linear-left:before,
+    .wp-block-cover.is-style-tick-linear-right:before {
+        display: none
+    }
+}
+
+.wp-block-cover.is-style-tick-linear-both-sides:before,
+.wp-block-cover.is-style-tick-linear-left:before {
+    left: 0;
+    -webkit-mask-image: linear-gradient(90deg, #000 60%, transparent);
+    mask-image: linear-gradient(90deg, #000 60%, transparent)
+}
+
+.wp-block-cover.is-style-tick-linear-both-sides:after,
+.wp-block-cover.is-style-tick-linear-right:before {
+    -webkit-mask-image: linear-gradient(270deg, #000 60%, transparent);
+    mask-image: linear-gradient(270deg, #000 60%, transparent);
+    right: 0
+}
+
+.wp-block-cover.is-style-tick-circle-left,
+.wp-block-cover.is-style-tick-circle-middle,
+.wp-block-cover.is-style-tick-circle-middle-large,
+.wp-block-cover.is-style-tick-circle-right,
+.wp-block-cover.is-style-tick-circle-rotate,
+.wp-block-cover.is-style-tick-circle-top {
+    overflow: hidden;
+    position: relative
+}
+
+.wp-block-cover.is-style-tick-circle-left .tick-circle-svg,
+.wp-block-cover.is-style-tick-circle-middle .tick-circle-svg,
+.wp-block-cover.is-style-tick-circle-middle-large .tick-circle-svg,
+.wp-block-cover.is-style-tick-circle-right .tick-circle-svg,
+.wp-block-cover.is-style-tick-circle-rotate .tick-circle-svg,
+.wp-block-cover.is-style-tick-circle-top .tick-circle-svg {
+    height: auto;
+    left: 50%;
+    max-width: 150%;
+    -o-object-fit: cover;
+    object-fit: cover;
+    opacity: .5;
+    overflow: visible;
+    pointer-events: none;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 150%;
+    z-index: 1
+}
+
+.wp-block-cover.is-style-tick-circle-left .tick-circle-svg circle,
+.wp-block-cover.is-style-tick-circle-middle .tick-circle-svg circle,
+.wp-block-cover.is-style-tick-circle-middle-large .tick-circle-svg circle,
+.wp-block-cover.is-style-tick-circle-right .tick-circle-svg circle,
+.wp-block-cover.is-style-tick-circle-rotate .tick-circle-svg circle,
+.wp-block-cover.is-style-tick-circle-top .tick-circle-svg circle {
+    r: min(550px, 30%)
+}
+
+.wp-block-cover.is-style-tick-circle-left .wp-block-cover__inner-container,
+.wp-block-cover.is-style-tick-circle-middle .wp-block-cover__inner-container,
+.wp-block-cover.is-style-tick-circle-middle-large .wp-block-cover__inner-container,
+.wp-block-cover.is-style-tick-circle-right .wp-block-cover__inner-container,
+.wp-block-cover.is-style-tick-circle-rotate .wp-block-cover__inner-container,
+.wp-block-cover.is-style-tick-circle-top .wp-block-cover__inner-container {
+    position: relative;
+    z-index: 2
+}
+
+.wp-block-cover.is-style-tick-circle-top .tick-circle-svg {
+    transform: translate(-50%, -40%)
+}
+
+.wp-block-cover.is-style-tick-circle-middle-large .tick-circle-svg circle {
+    r: min(770px, 40%)
+}
+
+.wp-block-cover.is-style-tick-circle-left .tick-circle-svg,
+.wp-block-cover.is-style-tick-circle-right .tick-circle-svg {
+    -webkit-mask-image: radial-gradient(circle, #000 0, #000 45%, transparent 50%, transparent 100%);
+    mask-image: radial-gradient(circle, #000 0, #000 45%, transparent 50%, transparent 100%);
+    mask-mode: alpha;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: cover;
+    mask-size: cover
+}
+
+.wp-block-cover.is-style-tick-circle-left .tick-circle-svg {
+    transform: translate(-75%, -40%)
+}
+
+.wp-block-cover.is-style-tick-circle-right .tick-circle-svg {
+    transform: translate(-32%, -40%)
+}
+
+.wp-block-cover.is-style-tick-circle-rotate .tick-circle-svg {
+    animation: tick-spin 190s linear infinite
+}
+
+@keyframes tick-spin {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg)
+    }
+    to {
+        transform: translate(-50%, -50%) rotate(1turn)
+    }
+}
+
+@media screen and (min-width:0px) {
+    body.block-editor-page .wp-block-cover.is-style-tick-circle-left:before,
+    body.block-editor-page .wp-block-cover.is-style-tick-circle-middle-large:before,
+    body.block-editor-page .wp-block-cover.is-style-tick-circle-middle:before,
+    body.block-editor-page .wp-block-cover.is-style-tick-circle-right:before,
+    body.block-editor-page .wp-block-cover.is-style-tick-circle-rotate:before,
+    body.block-editor-page .wp-block-cover.is-style-tick-circle-top:before {
+        background: repeating-conic-gradient(from 0deg, var(--tick-line-stroke) 0deg, var(--tick-line-stroke) .1deg, transparent .1deg, transparent 5deg);
+        border-radius: 50%;
+        content: "";
+        height: 500%;
+        left: 50%;
+        -webkit-mask-image: radial-gradient(circle, transparent 0 300px, #000 300px 80vmin);
+        mask-image: radial-gradient(circle, transparent 0 300px, #000 300px 80vmin);
+        overflow: visible;
+        pointer-events: none;
+        position: absolute;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 500%;
+        z-index: 2
+    }
+    body.block-editor-page .wp-block-cover.is-style-tick-circle-middle-large:before {
+        background: repeating-conic-gradient(from 0deg, var(--tick-line-stroke) 0deg, var(--tick-line-stroke) .1deg, transparent .1deg, transparent 5deg);
+        -webkit-mask-image: radial-gradient(circle, transparent 0 500px, #000 500px 80vmin);
+        mask-image: radial-gradient(circle, transparent 0 500px, #000 500px 80vmin)
+    }
+    body.block-editor-page .wp-block-cover.is-style-tick-circle-left:before,
+    body.block-editor-page .wp-block-cover.is-style-tick-circle-right:before {
+        height: 190vmin;
+        -webkit-mask-image: radial-gradient(circle, transparent 0 350px, #000 350px 80vmin);
+        mask-image: radial-gradient(circle, transparent 0 350px, #000 350px 80vmin);
+        width: 190vmin
+    }
+    body.block-editor-page .wp-block-cover.is-style-tick-circle-left:before {
+        left: 15%
+    }
+    body.block-editor-page .wp-block-cover.is-style-tick-circle-right:before {
+        left: 85%
+    }
+}
+
+.wp-block-cover.is-style-horizontal-bars-right .wp-block-cover__inner-container {
+    z-index: 3 !important
+}
+
+.wp-block-cover.is-style-horizontal-bars-right:after {
+    background-image: linear-gradient(var(--wp--preset--color--elevate), var(--wp--preset--color--elevate)), linear-gradient(var(--wp--preset--color--dark-elevate), var(--wp--preset--color--dark-elevate)), linear-gradient(var(--wp--preset--color--sage), var(--wp--preset--color--sage)), linear-gradient(var(--wp--preset--color--light-sage), var(--wp--preset--color--light-sage)), linear-gradient(var(--wp--preset--color--elevate), var(--wp--preset--color--elevate)), linear-gradient(var(--wp--preset--color--beacon-2), var(--wp--preset--color--beacon-2)), linear-gradient(var(--wp--preset--color--elevate), var(--wp--preset--color--elevate)), linear-gradient(var(--wp--preset--color--dark-sage), var(--wp--preset--color--dark-sage)), linear-gradient(var(--wp--preset--color--beacon-2), var(--wp--preset--color--beacon-2));
+    background-position: right 15px, right calc(12.5% - 5.25px), right calc(25% + 17.5px), right calc(37.5% - 3.5px), right calc(50% - 22.5px), right 62.5%, right calc(75% - 14px), right calc(87.5% + 3px), right calc(100% - 15px);
+    background-repeat: no-repeat;
+    background-size: 102.211px 16px, 307.703px 75px, 141.03px 34px, 243.598px 9px, 192.314px 41px, 102.211px 82px, 307.703px 12px, 243.598px 64px, 191.958px 15px;
+    content: "";
+    height: 100%;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 308px;
+    z-index: 2
+}
+
+body.block-editor-page .wp-block-cover.is-style-horizontal-bars-right:after {
+    left: 0;
+    width: auto
+}
+
+.wp-block-cover.is-style-horizontal-bars-right:before {
+    background-image: linear-gradient(var(--wp--preset--color--elevate), var(--wp--preset--color--elevate)), linear-gradient(var(--wp--preset--color--beacon-2), var(--wp--preset--color--beacon-2)), linear-gradient(var(--wp--preset--color--elevate), var(--wp--preset--color--elevate)), linear-gradient(var(--wp--preset--color--light-sage), var(--wp--preset--color--light-sage)), linear-gradient(var(--wp--preset--color--sage), var(--wp--preset--color--sage)), linear-gradient(var(--wp--preset--color--dark-elevate), var(--wp--preset--color--dark-elevate)), linear-gradient(var(--wp--preset--color--elevate), var(--wp--preset--color--elevate));
+    background-position: calc(12.5% - 23.684px) bottom, calc(25% - 25.62px) bottom, calc(37.5% + 6.267px) bottom, calc(50% + 3.686px) bottom, calc(62.5% - 2.119px) bottom, calc(75% + 23.961px) bottom, calc(87.5% + 23.316px) bottom;
+    background-repeat: no-repeat;
+    background-size: 8.847px 122.712px, 60.455px 40.762px, 30.228px 76.695px, 6.635px 97.147px, 25.067px 56.243px, 55.294px 122.712px, 11.796px 40.762px;
+    bottom: 0;
+    content: "";
+    display: none;
+    height: 123px;
+    left: 0;
+    pointer-events: none;
+    position: absolute;
+    width: 100%;
+    z-index: 2
+}
+
+@media(max-width:calc(782px - 0.02px)) {
+    .wp-block-cover.is-style-horizontal-bars-right:after {
+        display: none
+    }
+    .wp-block-cover.is-style-horizontal-bars-right:before {
+        display: block
+    }
+}
+
+.wp-block-cover.is-style-vertical-bars-right .wp-block-cover__inner-container {
+    z-index: 3 !important
+}
+
+.wp-block-cover.is-style-vertical-bars-right:after {
+    background-image: linear-gradient(var(--wp--preset--color--dark-elevate), var(--wp--preset--color--dark-elevate)), linear-gradient(var(--wp--preset--color--elevate), var(--wp--preset--color--elevate)), linear-gradient(var(--wp--preset--color--beacon-2), var(--wp--preset--color--beacon-2)), linear-gradient(var(--wp--preset--color--dark-sage), var(--wp--preset--color--dark-sage)), linear-gradient(var(--wp--preset--color--elevate), var(--wp--preset--color--elevate)), linear-gradient(var(--wp--preset--color--beacon-2), var(--wp--preset--color--beacon-2)), linear-gradient(var(--wp--preset--color--elevate), var(--wp--preset--color--elevate)), linear-gradient(var(--wp--preset--color--light-sage), var(--wp--preset--color--light-sage)), linear-gradient(var(--wp--preset--color--sage), var(--wp--preset--color--sage)), linear-gradient(var(--wp--preset--color--dark-elevate), var(--wp--preset--color--dark-elevate)), linear-gradient(var(--wp--preset--color--elevate), var(--wp--preset--color--elevate));
+    background-position: right 0 top 0, right 44px top 0, right 83px top 0, right 118px top 0, right 204px top 0, right 237px top 0, right 342px top 0, right 403px top 0, right 434px top 0, right 489px top 0, right 587px top 0;
+    background-repeat: no-repeat;
+    background-size: 23px 75px, 16px 44.083px, 15px 82.79px, 64px 105.062px, 12px 132.709px, 82px 44.083px, 41px 82.943px, 9px 105.062px, 34px 60.825px, 75px 132.709px, 16px 44.083px;
+    content: "";
+    height: 100%;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 603px;
+    z-index: 2
+}
+
+body.block-editor-page .wp-block-cover.is-style-vertical-bars-right:after {
+    left: 0;
+    width: auto
+}
+
+@media(max-width:calc(782px - 0.02px)) {
+    .wp-block-cover.is-style-vertical-bars-right:after {
+        display: none
+    }
+}
+
+.wp-block-cover.is-style-category-card:hover {
+    cursor: pointer
+}
+
+.wp-block-cover.is-style-category-card:hover .wp-block-cover__image-background {
+    left: -3%;
+    width: 105%
+}
+
+.wp-block-cover.is-style-category-card:hover .wp-block-button.is-style-view-more-invert .wp-block-button__link {
+    background-color: var(--wp--preset--color--beacon);
+    border: 1px solid var(--wp--preset--color--beacon)
+}
+
+.wp-block-cover.is-style-category-card:hover .wp-block-button.is-style-view-more-invert .wp-block-button__link:after {
+    color: var(--wp--preset--color--rooted)
+}
+
+.wp-block-cover.is-style-category-card .wp-block-cover__image-background {
+    transition: all .5s ease-in
+}

@@ -1,0 +1,95 @@
+.wp-block-think-blocks-g2-rating-sync {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap
+}
+
+@media(max-width:767px) {
+    .wp-block-think-blocks-g2-rating-sync {
+        justify-content: center
+    }
+}
+
+.g2-rating-sync__stars {
+    align-items: center;
+    display: flex;
+    gap: 2px
+}
+
+.g2-rating-sync__stars .g2-rating-sync__star {
+    color: #f0b429;
+    display: block;
+    flex-shrink: 0;
+    height: 1.25rem;
+    width: 1.25rem
+}
+
+.g2-rating-sync__stars .g2-rating-sync__star--half {
+    height: 1.125rem;
+    width: 1.125rem
+}
+
+.g2-rating-sync__content {
+    align-items: baseline;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .25em
+}
+
+.g2-rating-sync__copy {
+    display: inline
+}
+
+.g2-rating-sync__count-num,
+.g2-rating-sync__rating-num {
+    font-weight: 700
+}
+
+.g2-rating-sync__g2 {
+    color: #f0b429;
+    font-weight: 700
+}
+
+.wp-block-think-blocks-g2-rating-sync.is-variation-badge {
+    align-items: center;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: .75rem
+}
+
+.g2-rating-sync__logo-wrap {
+    align-items: center;
+    background: #fff;
+    border-radius: 50%;
+    display: flex;
+    flex-shrink: 0;
+    height: 1.5rem;
+    justify-content: center;
+    overflow: hidden;
+    width: 1.5rem
+}
+
+.g2-rating-sync__logo-wrap .g2-rating-sync__logo,
+.g2-rating-sync__logo-wrap svg {
+    display: block;
+    height: 1rem;
+    -o-object-fit: contain;
+    object-fit: contain;
+    width: 1rem
+}
+
+.g2-rating-sync__badge-copy {
+    align-items: baseline;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35em
+}
+
+.g2-rating-sync__rating-text {
+    font-weight: 700
+}
+
+.g2-rating-sync__reviews-text {
+    font-weight: 400;
+    opacity: .85
+}

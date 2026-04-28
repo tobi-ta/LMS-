@@ -1,0 +1,10 @@
+# macOS
+.DS_Store
+
+# Claude Code local state
+.claude/
+
+# Scrape leftovers at repo root (the site itself lives in extracted/)
+/*.zip
+/*.mp4
+/*.webp

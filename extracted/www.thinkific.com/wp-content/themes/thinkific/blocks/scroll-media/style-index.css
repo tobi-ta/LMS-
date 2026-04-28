@@ -1,0 +1,115 @@
+.thinkific-scroll-media-container {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: var(--scroll-media-column-gap, 10px)
+}
+
+.thinkific-scroll-media-container.is-left {
+    flex-direction: row
+}
+
+.thinkific-scroll-media-container .thinkific-scroll-media-row-wrapper:not(:last-child) {
+    margin-bottom: var(--scroll-media-row-gap, 10px)
+}
+
+.thinkific-scroll-media-track {
+    width: var(--scroll-media-content-width, 50%)
+}
+
+.thinkific-scroll-media-sticky-visuals {
+    display: block;
+    position: relative;
+    width: var(--scroll-media-sticky-width, 50%)
+}
+
+.thinkific-scroll-media-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 1
+}
+
+.thinkific-scroll-media-sticky.is-stuck {
+    transform: translateY(-50%)
+}
+
+.thinkific-scroll-media-sticky-box {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    width: 100%
+}
+
+.thinkific-scroll-media-sticky-item {
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s ease;
+    width: 100%
+}
+
+.thinkific-scroll-media-sticky-item.active {
+    display: block;
+    opacity: 1;
+    pointer-events: auto
+}
+
+.thinkific-scroll-media-sticky-item.is-align-top {
+    align-self: flex-start
+}
+
+.thinkific-scroll-media-sticky-item.is-align-center {
+    align-self: center
+}
+
+.thinkific-scroll-media-sticky-item.is-align-bottom {
+    align-self: flex-end
+}
+
+.thinkific-scroll-media-sticky-mobile {
+    display: none
+}
+
+.thinkific-scroll-media-container.is-locked-to-side {
+    align-items: center;
+    display: flex;
+    position: relative
+}
+
+.thinkific-scroll-media-container.is-locked-to-side .thinkific-scroll-media-sticky {
+    position: relative
+}
+
+.thinkific-scroll-media-container.is-locked-to-side .sticky-space {
+    transform: translatex(7%)
+}
+
+.thinkific-scroll-media-container.is-locked-to-side .sticky-space .thinkific-scroll-media-sticky-item {
+    display: flex;
+    justify-content: flex-end
+}
+
+.is-left.thinkific-scroll-media-container.is-locked-to-side .sticky-space {
+    transform: translatex(-11%);
+    width: -moz-fit-content;
+    width: fit-content
+}
+
+@media(max-width:767px) {
+    .thinkific-scroll-media-sticky-visuals {
+        display: none
+    }
+    .thinkific-scroll-media-track {
+        width: 100%
+    }
+    .thinkific-scroll-media-sticky-mobile {
+        display: block;
+        margin: 2rem 0
+    }
+    .mobile-media-bottom .thinkific-scroll-media-row-wrapper {
+        display: flex;
+        flex-direction: column-reverse
+    }
+    .thinkific-scroll-media-container .thinkific-scroll-media-row-wrapper:not(:last-child) {
+        margin-bottom: var(--scroll-media-row-gap-mobile, 10px)
+    }
+}

@@ -1,0 +1,2 @@
+ (function() { window.addEventListener('DOMContentLoaded', function () { if (typeof grecaptcha === 'undefined' && document.querySelector('.hubspot-form-container')) { loadRecaptcha(); } }); function loadRecaptcha() { var s = document.createElement('script');
+s.src = 'https://www.google.com/recaptcha/api.js?render=6Lc38q8qAAAAAOCUm8Ar7Mc4nSNYK08yIyrj4Ez-'; s.async = true; s.defer = true; s.onerror = function () { window.hubspotRecaptchaLoadFailed = true; }; document.body.appendChild(s); } })(); //# sourceURL=hubspot-front-end-scripts-js-after
