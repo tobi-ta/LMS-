@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Courses · Behind The Business</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" type="image/png" href="/btb-favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script>
+        window.tailwind.config = {
+            theme: { extend: {
+                fontFamily: { serif: ['Playfair Display', 'serif'], sans: ['Inter', 'sans-serif'] },
+                colors: { brand: { sand: '#F5F3EE', moss: '#2F3E34', taupe: '#6B6A67', clay: '#B66A4A', divider: '#DEDAD4' }},
+            }},
+        };
+    </script>
+    <style>
+        html { font-size: 17px; }
+        body { font-family: 'Inter', sans-serif; background-color: #F5F3EE; color: #2F3E34; margin: 0; -webkit-font-smoothing: antialiased; }
+        h1, h2, h3, h4, .serif { font-family: 'Playfair Display', serif; font-weight: 400; color: #2F3E34; }
+        .grain::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; opacity: 0.03; background-image: url("https://grainy-gradients.vercel.app/noise.svg"); }
+        .eyebrow { font-family: 'Inter', sans-serif; text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.75rem; font-weight: 500; color: #B66A4A; }
+    </style>
+</head>
+<body class="grain min-h-screen flex flex-col">
+
+<header class="w-full">
+    <div class="max-w-6xl mx-auto px-6 md:px-10 py-6 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-3">
+            <img src="/btb-logo.png" alt="Behind The Business" width="40" height="40" />
+            <span class="serif text-lg md:text-xl tracking-tight">Behind The Business</span>
+        </a>
+        <div class="flex items-center gap-5">
+            <span id="user-email" class="hidden md:inline-block text-sm text-brand-taupe"></span>
+            <a href="#" id="signout-link" class="text-sm text-brand-moss hover:text-brand-clay transition">Sign out</a>
+        </div>
+    </div>
+</header>
+
+<main class="flex-1">
+    <div class="max-w-6xl mx-auto px-6 md:px-10 py-12 md:py-20">
+        <p class="eyebrow mb-4">My courses</p>
+        <h1 class="serif text-4xl md:text-5xl mb-3">Welcome back<span id="user-name-greeting"></span>.</h1>
+        <p class="text-lg text-brand-taupe mb-12 max-w-2xl">Pick up where you left off, or start something new.</p>
+
+        <div id="courses-list" class="space-y-5">
+            <p class="text-sm text-brand-taupe">Loading your courses…</p>
+        </div>
+
+        </div>
+
+        <div class="mt-16 pt-8 border-t border-brand-divider">
+            <h2 class="serif text-2xl mb-4">Your certificates</h2>
+            <p class="text-sm text-brand-taupe">Complete a course to earn a certificate. Yours will appear here.</p>
+        </div>
+
+    </div>
+</main>
+
+<footer class="w-full border-t border-brand-divider">
+    <div class="max-w-6xl mx-auto px-6 md:px-10 py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs text-brand-taupe">
+        <p>© <span id="year"></span> Behind The Business.</p>
+        <a href="mailto:tobey@behindthebusiness.net" class="hover:text-brand-clay transition">tobey@behindthebusiness.net</a>
+    </div>
+</footer>
+<script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const SUPABASE_URL = 'https://wjndqsqgfmbrakzcagei.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_MQ_1krNKxWTmdC4nEF4eBg_U4ZBYHha';
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    (async () => {
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) {
+            window.location.href = '/login';
+            return;
+        }
+        const email = session.user.email;
+        document.getElementById('user-email').textContent = email;
+        const greetingName = ', ' + (email.split('@')[0] || '').replace(/[._-]/g, ' ');
+        document.getElementById('user-name-greeting').textContent = greetingName;
+        await loadCourses();
+    })();
+
+    async function loadCourses() {
+        const container = document.getElementById('courses-list');
+
+        const [enrollmentsRes, progressRes] = await Promise.all([
+            sb.from('enrollments').select('enrolled_at, course:courses (id, slug, course_number, title, subtitle, lesson_count, total_min)').order('enrolled_at', { ascending: true }),
+            sb.from('lesson_progress').select('lesson:lessons (course_id)')
+        ]);
+
+        if (enrollmentsRes.error) {
+            console.error('Failed to fetch enrollments:', enrollmentsRes.error);
+            container.innerHTML = '<p class="text-sm text-red-700">Could not load your courses. Try refreshing.</p>';
+            return;
+        }
+
+        const enrollments = enrollmentsRes.data || [];
+
+        // Count completed lessons per course_id
+        const completedByCourse = {};
+        (progressRes.data || []).forEach(p => {
+            const cid = p.lesson?.course_id;
+            if (cid) completedByCourse[cid] = (completedByCourse[cid] || 0) + 1;
+        });
+
+        if (enrollments.length === 0) {
+            container.innerHTML = '<p class="text-sm text-brand-taupe">You are not enrolled in any courses yet. <a href="/#courses" class="text-brand-moss underline">Browse courses</a>.</p>';
+            return;
+        }
+
+        const sorted = enrollments
+            .filter(e => e.course)
+            .sort((a, b) => a.course.course_number - b.course.course_number);
+
+        container.innerHTML = sorted.map(e => {
+            const c = e.course;
+            const courseNum = String(c.course_number).padStart(2, '0');
+            const hours = c.total_min ? `~${(c.total_min / 60).toFixed(1).replace('.0', '')} hrs total` : '';
+            const lessonText = `${c.lesson_count} lesson${c.lesson_count === 1 ? '' : 's'}${hours ? ' · ' + hours : ''}`;
+            const completed = completedByCourse[c.id] || 0;
+            const progress = c.lesson_count > 0 ? Math.round((completed / c.lesson_count) * 100) : 0;
+            const status = progress === 0 ? 'Not started' : progress === 100 ? 'Complete' : 'In progress';
+            const cta = progress === 0 ? 'Start course →' : progress === 100 ? 'Review →' : 'Continue learning →';
+            const href = `/courses/${c.slug}`;
+            const progressLabel = progress === 0
+                ? '0% complete'
+                : `${completed} of ${c.lesson_count} lessons · ${progress}% complete`;
+            return `
+                <a href="${href}" class="block border border-brand-divider bg-brand-sand p-6 md:p-8 hover:border-brand-moss transition">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                        <div class="flex-1">
+                            <p class="eyebrow mb-2">Course ${courseNum} · ${status}</p>
+                            <h3 class="serif text-2xl mb-1">${escapeHtml(c.title)}</h3>
+                            <p class="text-sm text-brand-taupe">${lessonText}</p>
+                        </div>
+                        <div class="md:min-w-[240px] md:text-right">
+                            <p class="text-xs text-brand-taupe mb-2">${progressLabel}</p>
+                            <div class="w-full md:w-56 md:ml-auto h-1 bg-brand-divider overflow-hidden mb-3">
+                                <div class="h-full bg-brand-clay" style="width: ${progress}%"></div>
+                            </div>
+                            <span class="text-sm text-brand-moss">${cta}</span>
+                        </div>
+                    </div>
+                </a>
+            `;
+        }).join('');
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    }
+
+    document.getElementById('signout-link').addEventListener('click', async e => {
+        e.preventDefault();
+        await sb.auth.signOut();
+        window.location.href = '/';
+    });
+</script>
+
+</body>
+</html>

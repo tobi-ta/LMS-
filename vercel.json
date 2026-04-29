@@ -3,5 +3,8 @@
   "buildCommand": null,
   "installCommand": null,
   "outputDirectory": "extracted",
-  "trailingSlash": false
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/courses/:slug", "destination": "/courses/player.html" }
+  ]
 }

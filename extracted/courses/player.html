@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Course · Behind The Business</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" type="image/png" href="/btb-favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script>
+        window.tailwind.config = {
+            theme: { extend: {
+                fontFamily: { serif: ['Playfair Display', 'serif'], sans: ['Inter', 'sans-serif'] },
+                colors: { brand: { sand: '#F5F3EE', moss: '#2F3E34', taupe: '#6B6A67', clay: '#B66A4A', divider: '#DEDAD4' }},
+            }},
+        };
+    </script>
+    <style>
+        html { font-size: 17px; }
+        body { font-family: 'Inter', sans-serif; background-color: #F5F3EE; color: #2F3E34; margin: 0; -webkit-font-smoothing: antialiased; }
+        h1, h2, h3, h4, .serif { font-family: 'Playfair Display', serif; font-weight: 400; color: #2F3E34; }
+        .grain::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; opacity: 0.03; background-image: url("https://grainy-gradients.vercel.app/noise.svg"); }
+        .eyebrow { font-family: 'Inter', sans-serif; text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.75rem; font-weight: 500; color: #B66A4A; }
+        .lesson-row { cursor: pointer; }
+        .lesson-row.active { background-color: #F5F3EE; border-left: 3px solid #B66A4A; padding-left: 13px; }
+        .lesson-row.done .lesson-num { color: #B66A4A; }
+    </style>
+</head>
+<body class="grain min-h-screen flex flex-col">
+
+<header class="w-full border-b border-brand-divider">
+    <div class="max-w-7xl mx-auto px-6 md:px-10 py-5 flex items-center justify-between">
+        <div class="flex items-center gap-6">
+            <a href="/dashboard" class="text-sm text-brand-taupe hover:text-brand-moss transition">
+                ← My courses
+            </a>
+            <a href="/" class="hidden md:flex items-center gap-3">
+                <img src="/btb-logo.png" alt="Behind The Business" width="32" height="32" />
+                <span class="serif text-base tracking-tight">Behind The Business</span>
+            </a>
+        </div>
+        <div class="flex items-center gap-5">
+            <span id="user-email" class="hidden md:inline-block text-sm text-brand-taupe"></span>
+            <a href="#" id="signout-link" class="text-sm text-brand-moss hover:text-brand-clay transition">Sign out</a>
+        </div>
+    </div>
+</header>
+
+<main class="flex-1 w-full">
+    <div class="max-w-7xl mx-auto px-6 md:px-10 py-8 md:py-12">
+
+        <div id="loading-state" class="text-sm text-brand-taupe">Loading course…</div>
+        <div id="error-state" class="hidden text-sm text-red-700 bg-red-50 border border-red-200 px-4 py-3"></div>
+
+        <div id="course-content" class="hidden">
+
+            <div class="mb-8">
+                <p id="course-eyebrow" class="eyebrow mb-2"></p>
+                <h1 id="course-title" class="serif text-3xl md:text-4xl mb-3"></h1>
+                <div class="flex flex-wrap items-center gap-4 text-sm text-brand-taupe">
+                    <span id="course-meta"></span>
+                    <span class="text-brand-divider">·</span>
+                    <span id="course-progress-text"></span>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-[1fr_320px] gap-10">
+
+                <div>
+                    <div class="bg-brand-moss aspect-video flex items-center justify-center mb-8">
+                        <video id="lesson-video" controls preload="metadata" class="w-full h-full">
+                            <source id="lesson-video-source" src="" type="video/mp4">
+                            Your browser does not support video playback.
+                        </video>
+                    </div>
+
+                    <p id="lesson-eyebrow" class="eyebrow mb-2"></p>
+                    <h2 id="lesson-title" class="serif text-2xl md:text-3xl mb-5"></h2>
+                    <div class="text-brand-taupe leading-relaxed space-y-4">
+                        <p id="lesson-description"></p>
+                    </div>
+
+                    <div class="mt-10 pt-6 border-t border-brand-divider flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" id="complete-checkbox" class="w-4 h-4" />
+                            <label for="complete-checkbox" class="text-sm text-brand-moss">Mark this lesson complete</label>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button id="prev-lesson" class="px-5 py-2.5 text-sm tracking-wide border border-brand-moss text-brand-moss hover:bg-brand-moss hover:text-brand-sand transition disabled:opacity-30 disabled:cursor-not-allowed">
+                                ← Previous
+                            </button>
+                            <button id="next-lesson" class="px-5 py-2.5 text-sm tracking-wide bg-brand-moss text-brand-sand hover:bg-brand-clay transition disabled:opacity-30 disabled:cursor-not-allowed">
+                                Next lesson →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <aside class="lg:sticky lg:top-6 lg:self-start">
+                    <div class="border border-brand-divider bg-brand-sand">
+                        <div class="px-5 py-4 border-b border-brand-divider">
+                            <p class="eyebrow mb-1">Course outline</p>
+                            <p id="sidebar-progress-text" class="text-xs text-brand-taupe"></p>
+                            <div class="w-full h-1 bg-brand-divider overflow-hidden mt-3">
+                                <div id="sidebar-progress-bar" class="h-full bg-brand-clay" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <ul id="lesson-list" class="text-sm"></ul>
+                    </div>
+                </aside>
+
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<footer class="w-full border-t border-brand-divider">
+    <div class="max-w-7xl mx-auto px-6 md:px-10 py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs text-brand-taupe">
+        <p>© <span id="year"></span> Behind The Business.</p>
+        <a href="mailto:tobey@behindthebusiness.net" class="hover:text-brand-clay transition">tobey@behindthebusiness.net</a>
+    </div>
+</footer>
+
+<script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const SUPABASE_URL = 'https://wjndqsqgfmbrakzcagei.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_MQ_1krNKxWTmdC4nEF4eBg_U4ZBYHha';
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Read slug from URL: /courses/the-systems-audit -> "the-systems-audit"
+    const path = window.location.pathname.replace(/\/$/, '');
+    const slug = path.split('/').pop();
+
+    let course = null;
+    let lessons = [];
+    let progressByLesson = {}; // lesson_id -> completed_at
+    let currentLessonId = null;
+    let userId = null;
+
+    function showError(msg) {
+        document.getElementById('loading-state').classList.add('hidden');
+        const el = document.getElementById('error-state');
+        el.textContent = msg;
+        el.classList.remove('hidden');
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    }
+
+    (async () => {
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) {
+            window.location.href = '/login';
+            return;
+        }
+        userId = session.user.id;
+        document.getElementById('user-email').textContent = session.user.email;
+
+        const { data: courseData, error: courseError } = await sb
+            .from('courses')
+            .select('*')
+            .eq('slug', slug)
+            .single();
+
+        if (courseError || !courseData) {
+            showError(`Course "${slug}" not found.`);
+            return;
+        }
+        course = courseData;
+
+        const { data: lessonsData, error: lessonsError } = await sb
+            .from('lessons')
+            .select('*')
+            .eq('course_id', course.id)
+            .order('sort_order', { ascending: true });
+
+        if (lessonsError) { showError('Could not load lessons: ' + lessonsError.message); return; }
+        lessons = lessonsData || [];
+
+        if (lessons.length === 0) {
+            renderHeader();
+            document.getElementById('course-content').classList.remove('hidden');
+            document.getElementById('loading-state').classList.add('hidden');
+            document.getElementById('lesson-list').innerHTML = '<li class="px-5 py-6 text-brand-taupe text-sm">No lessons published yet. Check back soon.</li>';
+            document.querySelector('aside .px-5.py-4').nextElementSibling; // no-op
+            // Hide the lesson body block since there's no lesson
+            document.querySelector('.grid.lg\\:grid-cols-\\[1fr_320px\\] > div:first-child').style.display = 'none';
+            return;
+        }
+
+        const lessonIds = lessons.map(l => l.id);
+        const { data: progressData } = await sb
+            .from('lesson_progress')
+            .select('lesson_id, completed_at')
+            .in('lesson_id', lessonIds);
+
+        progressByLesson = {};
+        (progressData || []).forEach(p => { progressByLesson[p.lesson_id] = p.completed_at; });
+
+        // Pick lesson to show: first not-completed, or first lesson if all done
+        const firstIncomplete = lessons.find(l => !progressByLesson[l.id]);
+        currentLessonId = (firstIncomplete || lessons[0]).id;
+
+        document.getElementById('loading-state').classList.add('hidden');
+        document.getElementById('course-content').classList.remove('hidden');
+        renderAll();
+    })();
+
+    function currentLesson() {
+        return lessons.find(l => l.id === currentLessonId);
+    }
+
+    function completedCount() {
+        return lessons.filter(l => progressByLesson[l.id]).length;
+    }
+
+    function renderHeader() {
+        const courseNum = String(course.course_number).padStart(2, '0');
+        document.getElementById('course-eyebrow').textContent = `Course ${courseNum}`;
+        document.getElementById('course-title').textContent = course.title;
+        const hours = course.total_min ? `~${(course.total_min / 60).toFixed(1).replace('.0', '')} hrs total` : '';
+        document.getElementById('course-meta').textContent = `${course.lesson_count} lessons${hours ? ' · ' + hours : ''}`;
+    }
+
+    function renderAll() {
+        renderHeader();
+        renderProgress();
+        renderSidebar();
+        renderLesson();
+    }
+
+    function renderProgress() {
+        const done = completedCount();
+        const total = lessons.length;
+        const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+        const lesson = currentLesson();
+        const lessonIdx = lesson ? lessons.indexOf(lesson) + 1 : 0;
+        document.getElementById('course-progress-text').textContent =
+            `Lesson ${lessonIdx} of ${total} · ${pct}% complete`;
+        document.getElementById('sidebar-progress-text').textContent =
+            `${done} of ${total} lessons complete`;
+        document.getElementById('sidebar-progress-bar').style.width = pct + '%';
+    }
+
+    function renderSidebar() {
+        const html = lessons.map(l => {
+            const isDone = !!progressByLesson[l.id];
+            const isActive = l.id === currentLessonId;
+            const cls = ['lesson-row', 'flex', 'items-start', 'gap-3', 'px-4', 'py-3', 'transition'];
+            if (isDone) cls.push('done');
+            if (isActive) cls.push('active');
+            else cls.push('hover:bg-brand-divider/30');
+            const num = String(l.lesson_number).padStart(2, '0');
+            const meta = isDone ? `${l.duration_min} min · ✓ done` : isActive ? `${l.duration_min} min · ▶ playing` : `${l.duration_min} min`;
+            return `
+                <li>
+                    <a href="#" data-lesson-id="${l.id}" class="${cls.join(' ')}">
+                        <span class="lesson-num text-xs font-medium pt-0.5 min-w-[20px] ${isDone || isActive ? '' : 'text-brand-taupe'}">${num}</span>
+                        <span class="flex-1">
+                            <span class="block ${isActive ? 'font-medium' : ''}">${escapeHtml(l.title)}</span>
+                            <span class="text-xs text-brand-taupe">${meta}</span>
+                        </span>
+                    </a>
+                </li>
+            `;
+        }).join('');
+        const list = document.getElementById('lesson-list');
+        list.innerHTML = html;
+        list.querySelectorAll('a[data-lesson-id]').forEach(a => {
+            a.addEventListener('click', e => {
+                e.preventDefault();
+                currentLessonId = a.getAttribute('data-lesson-id');
+                renderAll();
+            });
+        });
+    }
+
+    function renderLesson() {
+        const l = currentLesson();
+        if (!l) return;
+        const num = String(l.lesson_number).padStart(2, '0');
+        document.getElementById('lesson-eyebrow').textContent = `Lesson ${num}`;
+        document.getElementById('lesson-title').textContent = l.title;
+        document.getElementById('lesson-description').textContent = l.description || '';
+        const video = document.getElementById('lesson-video');
+        const source = document.getElementById('lesson-video-source');
+        const newSrc = l.video_path || '';
+        if (source.src !== window.location.origin + newSrc) {
+            source.src = newSrc;
+            video.load();
+        }
+        const checkbox = document.getElementById('complete-checkbox');
+        checkbox.checked = !!progressByLesson[l.id];
+
+        const idx = lessons.indexOf(l);
+        document.getElementById('prev-lesson').disabled = idx === 0;
+        document.getElementById('next-lesson').disabled = idx === lessons.length - 1;
+    }
+
+    document.getElementById('complete-checkbox').addEventListener('change', async e => {
+        const l = currentLesson();
+        if (!l) return;
+        const checked = e.target.checked;
+        e.target.disabled = true;
+        try {
+            if (checked) {
+                const { error } = await sb.from('lesson_progress').insert({ user_id: userId, lesson_id: l.id });
+                if (error) { console.error(error); e.target.checked = false; return; }
+                progressByLesson[l.id] = new Date().toISOString();
+            } else {
+                const { error } = await sb.from('lesson_progress').delete().eq('lesson_id', l.id).eq('user_id', userId);
+                if (error) { console.error(error); e.target.checked = true; return; }
+                delete progressByLesson[l.id];
+            }
+            renderProgress();
+            renderSidebar();
+        } finally {
+            e.target.disabled = false;
+        }
+    });
+
+    document.getElementById('prev-lesson').addEventListener('click', () => {
+        const idx = lessons.findIndex(l => l.id === currentLessonId);
+        if (idx > 0) {
+            currentLessonId = lessons[idx - 1].id;
+            renderAll();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
+
+    document.getElementById('next-lesson').addEventListener('click', () => {
+        const idx = lessons.findIndex(l => l.id === currentLessonId);
+        if (idx < lessons.length - 1) {
+            currentLessonId = lessons[idx + 1].id;
+            renderAll();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
+
+    document.getElementById('signout-link').addEventListener('click', async e => {
+        e.preventDefault();
+        await sb.auth.signOut();
+        window.location.href = '/';
+    });
+</script>
+
+</body>
+</html>

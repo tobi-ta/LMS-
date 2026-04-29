@@ -1,5 +1,6 @@
 # macOS
 .DS_Store
+**/.DS_Store
 
 # Claude Code local state
 .claude/
@@ -8,3 +9,30 @@
 /*.zip
 /*.mp4
 /*.webp
+
+# Videos — kept local for practice, never published
+videos/
+extracted/videos/
+*.mp4
+*.mov
+*.webm
+*.m4v
+*.mkv
+
+# Node / build
+node_modules/
+dist/
+build/
+
+# Editor
+.vscode/
+.idea/
+
+# Logs
+*.log
+*.tmp
+
+# Secrets (defensive)
+.env
+.env.local
+.env.*.local

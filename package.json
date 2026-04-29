@@ -1,0 +1,7 @@
+{
+  "name": "lms-website",
+  "private": true,
+  "scripts": {
+    "dev": "npx serve extracted -l 3000"
+  }
+}

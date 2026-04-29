@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Behind The Business | Operational Infrastructure</title>
+    <meta name="description" content="A boutique execution partnership for founders running $1–10M practitioner-led businesses. We audit, build, and own the operational infrastructure behind your business." />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <link rel="canonical" href="https://www.behindthebusiness.com/" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Behind The Business | Operational Infrastructure" />
+    <meta property="og:description" content="A boutique execution partnership for founders running $1–10M practitioner-led businesses. We audit, build, and own the operational infrastructure behind your business." />
+    <meta property="og:url" content="https://www.behindthebusiness.com/" />
+    <meta property="og:site_name" content="Behind The Business" />
+    <meta property="og:image" content="https://www.behindthebusiness.com/btb-logo.png" />
+    <meta property="og:image:width" content="400" />
+    <meta property="og:image:height" content="400" />
+    <meta property="og:image:type" content="image/png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="{{twitter-handle}}" />
+
+    <link rel="icon" type="image/png" href="/btb-favicon.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        window.tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            sand: '#F5F3EE',
+                            moss: '#2F3E34',
+                            taupe: '#6B6A67',
+                            clay: '#B66A4A',
+                            divider: '#DEDAD4',
+                        },
+                    },
+                },
+            },
+        };
+    </script>
+
+    <style>
+        html { scroll-behavior: smooth; font-size: 17px; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F5F3EE;
+            color: #2F3E34;
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+        h1, h2, h3, h4, .serif {
+            font-family: 'Playfair Display', serif;
+            font-weight: 400;
+            color: #2F3E34;
+        }
+        .grain::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.03;
+            background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+        }
+        .eyebrow {
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #B66A4A;
+        }
+        .rule { border-top: 1px solid #DEDAD4; }
+    </style>
+</head>
+<body class="grain">
+
+<!-- ============================ HEADER ============================ -->
+<header class="w-full">
+    <div class="max-w-6xl mx-auto px-6 md:px-10 py-6 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-3">
+            <img src="/btb-logo.png" alt="Behind The Business" width="40" height="40" class="block" />
+            <span class="serif text-lg md:text-xl tracking-tight">Behind The Business</span>
+        </a>
+
+        <nav class="hidden md:flex items-center gap-8 text-sm">
+            <a href="#offer" class="hover:text-brand-clay transition">How we work</a>
+            <a href="#deliverables" class="hover:text-brand-clay transition">What we own</a>
+            <a href="#fit" class="hover:text-brand-clay transition">Who it's for</a>
+            <a href="#about" class="hover:text-brand-clay transition">About</a>
+        </nav>
+
+        <a href="#book-audit" class="inline-block bg-brand-moss text-brand-sand px-5 py-2.5 text-sm tracking-wide hover:bg-brand-clay transition">
+            Book a Systems Audit
+        </a>
+    </div>
+</header>
+
+<!-- ============================ HERO ============================ -->
+<section class="w-full">
+    <div class="max-w-5xl mx-auto px-6 md:px-10 pt-12 md:pt-24 pb-20 md:pb-32">
+        <p class="eyebrow mb-6">Operational Infrastructure</p>
+        <h1 class="serif text-4xl md:text-6xl lg:text-7xl leading-[1.05] tracking-tight mb-8">
+            The business runs on you.<br />
+            <em class="italic text-brand-clay">We're here to change that.</em>
+        </h1>
+        <p class="text-lg md:text-xl text-brand-taupe max-w-2xl leading-relaxed mb-10">
+            Behind The Business is a boutique execution partnership for founders running $1–10M practitioner-led companies. We audit, build, and own the operational infrastructure — CRM, workflows, automations, integrations — so the business stops moving at the speed of your bandwidth.
+        </p>
+        <div class="flex flex-wrap items-center gap-4">
+            <a href="#book-audit" class="inline-block bg-brand-moss text-brand-sand px-6 py-3.5 text-sm tracking-wide hover:bg-brand-clay transition">
+                Book a Systems Audit
+            </a>
+            <a href="#offer" class="inline-block px-6 py-3.5 text-sm tracking-wide border border-brand-moss text-brand-moss hover:bg-brand-moss hover:text-brand-sand transition">
+                See how we work
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ============================ PROBLEM ============================ -->
+<section class="w-full bg-brand-moss text-brand-sand">
+    <div class="max-w-6xl mx-auto px-6 md:px-10 py-20 md:py-28">
+        <p class="eyebrow mb-6" style="color: #B66A4A;">The Problem</p>
+        <h2 class="serif text-3xl md:text-5xl leading-tight mb-6 text-brand-sand" style="color: #F5F3EE;">
+            The Scaling Founder Crisis
+        </h2>
+        <p class="text-lg md:text-xl max-w-3xl leading-relaxed mb-16 opacity-90">
+            Revenue scales. The backend doesn't. So you absorb it all — more decisions, more coordination, more fires, more dependency. Growth was supposed to create freedom. Instead it created a more expensive trap.
+        </p>
+
+        <div class="grid md:grid-cols-3 gap-10 md:gap-14">
+            <div>
+                <p class="eyebrow mb-3" style="color: #B66A4A;">Don't know HOW</p>
+                <h3 class="serif text-2xl mb-4" style="color: #F5F3EE;">You can describe it. You can't architect it.</h3>
+                <p class="opacity-85 leading-relaxed">"I want my CRM to track clients through delivery." Clear ask. No path from there to a working pipeline.</p>
+            </div>
+            <div>
+                <p class="eyebrow mb-3" style="color: #B66A4A;">Don't have WHO</p>
+                <h3 class="serif text-2xl mb-4" style="color: #F5F3EE;">Your team is great. Nobody on it thinks in systems.</h3>
+                <p class="opacity-85 leading-relaxed">A VA follows instructions. A great practitioner runs the work. Neither of them designs infrastructure.</p>
+            </div>
+            <div>
+                <p class="eyebrow mb-3" style="color: #B66A4A;">Don't have WHEN</p>
+                <h3 class="serif text-2xl mb-4" style="color: #F5F3EE;">Infrastructure work keeps losing to the day-to-day.</h3>
+                <p class="opacity-85 leading-relaxed">You're too busy running operations to fix operations. Every weekend build dies on Monday.</p>
+            </div>
+        </div>
+
+        <p class="serif italic text-xl md:text-2xl mt-16 opacity-80 max-w-3xl">
+            That's why the weekend build fails, the new hire doesn't help, and the new tool doesn't stick.
+        </p>
+    </div>
+</section>
+
+<!-- ============================ OFFER LADDER ============================ -->
+<section id="offer" class="w-full">
+    <div class="max-w-6xl mx-auto px-6 md:px-10 py-20 md:py-28">
+        <p class="eyebrow mb-6">How we work</p>
+        <h2 class="serif text-3xl md:text-5xl leading-tight mb-6">Three steps. You don't commit to all three on day one.</h2>
+        <p class="text-lg text-brand-taupe max-w-3xl leading-relaxed mb-16">
+            The Audit tells us — and you — whether the rest makes sense.
+        </p>
+
+        <div class="grid md:grid-cols-3 gap-8">
+
+            <!-- Card 1 -->
+            <article class="border border-brand-divider p-8 md:p-10 bg-brand-sand flex flex-col">
+                <p class="eyebrow mb-4">Step 1</p>
+                <h3 class="serif text-3xl mb-2">Systems Audit</h3>
+                <p class="text-brand-clay font-medium mb-6">$7,000 · 1 month</p>
+                <p class="text-brand-taupe leading-relaxed mb-8 flex-1">
+                    A deep diagnostic of how the business actually works. We get inside the operation, talk to you and your team, and spend time in your tools. You leave with a clear picture of your infrastructure, a prioritized roadmap, and an honest answer on whether full systems ownership is needed.
+                </p>
+                <a href="#book-audit" class="text-sm tracking-wide text-brand-moss hover:text-brand-clay transition border-b border-brand-moss hover:border-brand-clay pb-1 self-start">
+                    Book the Audit →
+                </a>
+            </article>
+
+            <!-- Card 2 -->
+            <article class="border border-brand-divider p-8 md:p-10 bg-brand-sand flex flex-col">
+                <p class="eyebrow mb-4">Step 2</p>
+                <h3 class="serif text-3xl mb-2">Ownership Engagement</h3>
+                <p class="text-brand-clay font-medium mb-6">$20,000–$50,000 · 4–10 months</p>
+                <p class="text-brand-taupe leading-relaxed mb-8 flex-1">
+                    We take the seat and own the entire systems layer. CRM structure, workflow architecture, automation logic, cross-tool integrations, permissions, documentation, and team training. Paid in milestones (40 / 30 / 20 / 10) so you only fund the next phase when the last one delivers.
+                </p>
+                <a href="#deliverables" class="text-sm tracking-wide text-brand-moss hover:text-brand-clay transition border-b border-brand-moss hover:border-brand-clay pb-1 self-start">
+                    See what we own →
+                </a>
+            </article>
+
+            <!-- Card 3 -->
+            <article class="border border-brand-divider p-8 md:p-10 bg-brand-sand flex flex-col">
+                <p class="eyebrow mb-4">Step 3</p>
+                <h3 class="serif text-3xl mb-2">Fractional Retainer</h3>
+                <p class="text-brand-clay font-medium mb-6">$1,000/month · optional</p>
+                <p class="text-brand-taupe leading-relaxed mb-8 flex-1">
+                    After the build, we keep the system alive. Troubleshooting, quick questions, minor adjustments as the business evolves. Not new builds — the relationship that makes sure nothing decays.
+                </p>
+                <span class="text-sm tracking-wide text-brand-taupe italic self-start">Available after Engagement.</span>
+            </article>
+
+        </div>
+    </div>
+</section>
+
+<!-- ============================ DELIVERABLES ============================ -->
+<section id="deliverables" class="w-full" style="background-color: #ECEAE3;">
+    <div class="max-w-6xl mx-auto px-6 md:px-10 py-20 md:py-28">
+        <p class="eyebrow mb-6">What we own</p>
+        <h2 class="serif text-3xl md:text-5xl leading-tight mb-6">Nine deliverables. One operational layer.</h2>
+        <p class="text-lg text-brand-taupe max-w-3xl leading-relaxed mb-16">
+            The Ownership Engagement covers the full backend. Together these form the operational layer that lets the business run without you pushing every step.
+        </p>
+
+        <div class="grid md:grid-cols-3 gap-px bg-brand-divider">
+            <div class="bg-brand-sand p-8">
+                <h3 class="serif text-xl mb-3">CRM structure</h3>
+                <p class="text-brand-taupe leading-relaxed text-sm">How your client data is organized — pipeline stages, custom fields, automations, views, permissions.</p>
+            </div>
+            <div class="bg-brand-sand p-8">
+                <h3 class="serif text-xl mb-3">Workflow architecture</h3>
+                <p class="text-brand-taupe leading-relaxed text-sm">How work moves without you pushing it. Tasks, approvals, and handoffs route through defined paths.</p>
+            </div>
+            <div class="bg-brand-sand p-8">
+                <h3 class="serif text-xl mb-3">Automation logic</h3>
+                <p class="text-brand-taupe leading-relaxed text-sm">Tools that talk to each other. CRM, invoicing, scheduling, and comms connected into one backend.</p>
+            </div>
+            <div class="bg-brand-sand p-8">
+                <h3 class="serif text-xl mb-3">Permission layers</h3>
+                <p class="text-brand-taupe leading-relaxed text-sm">Who can do what. The team works inside the system without needing you to verify everything.</p>
+            </div>
+            <div class="bg-brand-sand p-8">
+                <h3 class="serif text-xl mb-3">Process documentation</h3>
+                <p class="text-brand-taupe leading-relaxed text-sm">Living documentation owned and updated as the business evolves. Not a manual that decays.</p>
+            </div>
+            <div class="bg-brand-sand p-8">
+                <h3 class="serif text-xl mb-3">Cross-tool integrations</h3>
+                <p class="text-brand-taupe leading-relaxed text-sm">One backend, not six islands. Update once, it reflects everywhere.</p>
+            </div>
+            <div class="bg-brand-sand p-8">
+                <h3 class="serif text-xl mb-3">Training &amp; enablement</h3>
+                <p class="text-brand-taupe leading-relaxed text-sm">The team learns to operate confidently within the new infrastructure — not just hand-them-a-doc.</p>
+            </div>
+            <div class="bg-brand-sand p-8">
+                <h3 class="serif text-xl mb-3">Operational tracking</h3>
+                <p class="text-brand-taupe leading-relaxed text-sm">Dashboards and reporting that give you visibility without checking each tool or asking each person.</p>
+            </div>
+            <div class="bg-brand-sand p-8">
+                <h3 class="serif text-xl mb-3">Execution integrity</h3>
+                <p class="text-brand-taupe leading-relaxed text-sm">When the business changes — new clients, new team, new tools — the infrastructure adapts. Someone is accountable.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================ ICP FIT ============================ -->
+<section id="fit" class="w-full">
+    <div class="max-w-6xl mx-auto px-6 md:px-10 py-20 md:py-28">
+        <p class="eyebrow mb-6">Fit Check</p>
+        <h2 class="serif text-3xl md:text-5xl leading-tight mb-6">Who this is for.</h2>
+        <p class="text-lg text-brand-taupe max-w-3xl leading-relaxed mb-16">
+            We work with three founders at a time. Slots are deliberately scarce because the depth is the value. Engagements rotate by design.
+        </p>
+
+        <div class="grid md:grid-cols-2 gap-12 md:gap-20">
+            <div>
+                <h3 class="serif text-2xl mb-6 text-brand-moss">It's a fit if you're —</h3>
+                <ul class="space-y-4">
+                    <li class="flex gap-3">
+                        <span class="text-brand-clay select-none">→</span>
+                        <span>A founder doing <strong>$1M–$10M</strong> in revenue</span>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="text-brand-clay select-none">→</span>
+                        <span>Running a team of <strong>5–25 people</strong></span>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="text-brand-clay select-none">→</span>
+                        <span>Built your business around a craft that <strong>isn't operations</strong> — practitioner, advisor, owner-operator</span>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="text-brand-clay select-none">→</span>
+                        <span>Still the <strong>final escalation point</strong> for everything that breaks</span>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="text-brand-clay select-none">→</span>
+                        <span>Comfortable with a <strong>$3K+ engagement</strong> and choosing one partner over stitching freelancers</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="serif text-2xl mb-6 text-brand-taupe">It's not a fit if you're —</h3>
+                <ul class="space-y-4 text-brand-taupe">
+                    <li class="flex gap-3">
+                        <span class="select-none">×</span>
+                        <span>Pre-revenue or solopreneur</span>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="select-none">×</span>
+                        <span>Running a coaching or info-product business</span>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="select-none">×</span>
+                        <span>A tech founder, fractional COO, or systems consultant — your problem is different</span>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="select-none">×</span>
+                        <span>Already have an ops or systems owner in seat</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================ ABOUT TEASER ============================ -->
+<section id="about" class="w-full bg-brand-moss text-brand-sand">
+    <div class="max-w-5xl mx-auto px-6 md:px-10 py-20 md:py-28">
+        <p class="eyebrow mb-6" style="color: #B66A4A;">Behind the partnership</p>
+        <h2 class="serif text-3xl md:text-5xl leading-tight mb-8" style="color: #F5F3EE;">
+            Built by Tobey Tobias after a decade of watching the same pattern.
+        </h2>
+        <p class="text-lg md:text-xl leading-relaxed opacity-90 max-w-3xl">
+            Founders crossing into the $1M–$10M range hit the same operational wall and discover the seat responsible for systems is empty — so they fill it themselves. Behind The Business exists to take that seat. Three engagements at a time, deep work, premium accountability.
+        </p>
+    </div>
+</section>
+
+<!-- ============================ FINAL CTA ============================ -->
+<section id="book-audit" class="w-full">
+    <div class="max-w-5xl mx-auto px-6 md:px-10 py-20 md:py-28 text-center">
+        <h2 class="serif text-3xl md:text-5xl leading-tight mb-6">
+            The business shouldn't move at the speed of your calendar.
+        </h2>
+        <p class="text-lg text-brand-taupe max-w-2xl mx-auto leading-relaxed mb-10">
+            Start with the Audit. One month, one fee, and a clear-eyed look at the systems behind your business.
+        </p>
+        <a href="{{audit-booking-url}}" class="inline-block bg-brand-moss text-brand-sand px-8 py-4 text-sm tracking-wide hover:bg-brand-clay transition">
+            Book a Systems Audit
+        </a>
+        <p class="mt-6 text-sm text-brand-taupe">
+            Or email us directly: <a href="mailto:{{contact-email}}" class="underline hover:text-brand-clay">{{contact-email}}</a>
+        </p>
+    </div>
+</section>
+
+<!-- ============================ FOOTER ============================ -->
+<footer class="w-full border-t border-brand-divider">
+    <div class="max-w-6xl mx-auto px-6 md:px-10 py-12">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+
+            <div class="flex items-center gap-3">
+                <img src="/btb-logo.png" alt="Behind The Business" width="32" height="32" />
+                <div>
+                    <p class="serif text-base">Behind The Business</p>
+                    <p class="text-xs text-brand-taupe">Operational Infrastructure</p>
+                </div>
+            </div>
+
+            <nav class="flex flex-wrap gap-6 text-sm text-brand-taupe">
+                <a href="#offer" class="hover:text-brand-clay transition">How we work</a>
+                <a href="#deliverables" class="hover:text-brand-clay transition">What we own</a>
+                <a href="#fit" class="hover:text-brand-clay transition">Who it's for</a>
+                <a href="#about" class="hover:text-brand-clay transition">About</a>
+            </nav>
+
+            <div class="flex flex-wrap gap-4 text-sm text-brand-taupe">
+                <a href="{{linkedin-url}}" class="hover:text-brand-clay transition" aria-label="LinkedIn">LinkedIn</a>
+                <a href="{{twitter-url}}" class="hover:text-brand-clay transition" aria-label="X / Twitter">X</a>
+                <a href="{{youtube-url}}" class="hover:text-brand-clay transition" aria-label="YouTube">YouTube</a>
+                <a href="{{instagram-url}}" class="hover:text-brand-clay transition" aria-label="Instagram">Instagram</a>
+            </div>
+
+        </div>
+
+        <div class="rule mt-10 pt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-xs text-brand-taupe">
+            <p>© <span id="year"></span> Behind The Business. All rights reserved.</p>
+            <div class="flex gap-6">
+                <a href="{{privacy-url}}" class="hover:text-brand-clay transition">Privacy</a>
+                <a href="{{terms-url}}" class="hover:text-brand-clay transition">Terms</a>
+                <a href="mailto:{{contact-email}}" class="hover:text-brand-clay transition">{{contact-email}}</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>
