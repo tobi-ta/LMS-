@@ -8,6 +8,6 @@
   "rewrites": [
     { "source": "/login", "destination": "/login.html" },
     { "source": "/dashboard", "destination": "/dashboard.html" },
-    { "source": "/courses/:slug", "destination": "/courses/player.html" }
+    { "source": "/courses/:slug", "destination": "/course-player.html" }
   ]
 }
