@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Course · Behind The Business</title>
+    <link rel="icon" type="image/png" href="/btb-favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script>
+        window.tailwind.config = {
+            theme: { extend: {
+                fontFamily: { serif: ['Playfair Display', 'serif'], sans: ['Inter', 'sans-serif'] },
+                colors: { brand: { sand: '#F5F3EE', moss: '#2F3E34', taupe: '#6B6A67', clay: '#B66A4A', divider: '#DEDAD4' }},
+            }},
+        };
+    </script>
+    <style>
+        html { font-size: 17px; }
+        body { font-family: 'Inter', sans-serif; background-color: #F5F3EE; color: #2F3E34; margin: 0; -webkit-font-smoothing: antialiased; }
+        h1, h2, h3, h4, .serif { font-family: 'Playfair Display', serif; font-weight: 400; color: #2F3E34; }
+        .grain::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; opacity: 0.03; background-image: url("https://grainy-gradients.vercel.app/noise.svg"); }
+        .eyebrow { font-family: 'Inter', sans-serif; text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.75rem; font-weight: 500; color: #B66A4A; }
+        .rule { border-top: 1px solid #DEDAD4; }
+    </style>
+</head>
+<body class="grain min-h-screen flex flex-col">
+
+<header class="w-full">
+    <div class="max-w-6xl mx-auto px-6 md:px-10 py-6 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-3">
+            <img src="/btb-logo.png" alt="Behind The Business" width="40" height="40" />
+            <span class="serif text-lg md:text-xl tracking-tight">Behind The Business</span>
+        </a>
+        <div class="flex items-center gap-5">
+            <a href="/#courses" class="text-sm text-brand-taupe hover:text-brand-clay transition">All Courses</a>
+            <a id="auth-link" href="/login" class="text-sm text-brand-moss hover:text-brand-clay transition">Sign in</a>
+        </div>
+    </div>
+</header>
+
+<main class="flex-1">
+    <div id="loading-state" class="max-w-6xl mx-auto px-6 md:px-10 py-20 text-sm text-brand-taupe">Loading course…</div>
+    <div id="error-state" class="hidden max-w-6xl mx-auto px-6 md:px-10 py-20 text-sm text-red-700"></div>
+
+    <div id="preview-content" class="hidden">
+
+        <!-- Hero -->
+        <section class="w-full">
+            <div class="max-w-6xl mx-auto px-6 md:px-10 pt-12 md:pt-20 pb-16">
+                <div class="grid md:grid-cols-2 gap-10 md:gap-14 items-start">
+                    <div>
+                        <p id="course-eyebrow" class="eyebrow mb-4"></p>
+                        <h1 id="course-title" class="serif text-4xl md:text-5xl leading-tight mb-4"></h1>
+                        <p id="course-subtitle" class="text-lg text-brand-taupe leading-relaxed mb-8"></p>
+                        <div class="flex flex-wrap items-center gap-4 text-sm text-brand-taupe mb-8">
+                            <span id="course-lessons" class="flex items-center gap-1.5"></span>
+                            <span class="text-brand-divider">·</span>
+                            <span id="course-hours"></span>
+                            <span class="text-brand-divider">·</span>
+                            <span>Self-paced</span>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-4">
+                            <a id="enroll-btn" href="#" class="inline-block bg-brand-moss text-brand-sand px-8 py-4 text-sm tracking-wide hover:bg-brand-clay transition">
+                                Enroll Now
+                            </a>
+                            <p id="course-price" class="serif text-3xl text-brand-clay font-medium"></p>
+                        </div>
+                    </div>
+                    <div class="border border-brand-divider bg-brand-sand p-8 md:p-10">
+                        <h3 class="serif text-xl mb-5">What you'll walk away with</h3>
+                        <ul id="course-outcomes" class="space-y-3 text-sm text-brand-taupe"></ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Curriculum -->
+        <section class="w-full" style="background-color: #ECEAE3;">
+            <div class="max-w-6xl mx-auto px-6 md:px-10 py-16 md:py-20">
+                <p class="eyebrow mb-4">Curriculum</p>
+                <h2 class="serif text-3xl md:text-4xl mb-3">What's inside</h2>
+                <p id="curriculum-summary" class="text-brand-taupe mb-10"></p>
+                <div id="lesson-list" class="space-y-1"></div>
+            </div>
+        </section>
+
+        <!-- Who it's for -->
+        <section class="w-full">
+            <div class="max-w-6xl mx-auto px-6 md:px-10 py-16 md:py-20">
+                <div class="grid md:grid-cols-2 gap-10 md:gap-14">
+                    <div>
+                        <p class="eyebrow mb-4">Who this is for</p>
+                        <h2 class="serif text-3xl md:text-4xl mb-6">Is this course right for you?</h2>
+                        <ul class="space-y-4 text-brand-taupe">
+                            <li class="flex gap-3"><span class="text-brand-clay select-none">→</span><span>Founders running $1M–$10M businesses who aren't systems specialists</span></li>
+                            <li class="flex gap-3"><span class="text-brand-clay select-none">→</span><span>Teams of 5–25 where the founder is still the final escalation point</span></li>
+                            <li class="flex gap-3"><span class="text-brand-clay select-none">→</span><span>Anyone who knows what they need but can't architect the solution</span></li>
+                            <li class="flex gap-3"><span class="text-brand-clay select-none">→</span><span>Operators who want to build infrastructure without hiring a consultant</span></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <p class="eyebrow mb-4">What you get</p>
+                        <h2 class="serif text-3xl md:text-4xl mb-6">Everything included</h2>
+                        <ul class="space-y-4 text-brand-taupe">
+                            <li class="flex gap-3"><span class="text-brand-clay select-none">→</span><span>Full video curriculum — watch at your own pace</span></li>
+                            <li class="flex gap-3"><span class="text-brand-clay select-none">→</span><span>Progress tracking — pick up where you left off</span></li>
+                            <li class="flex gap-3"><span class="text-brand-clay select-none">→</span><span>Certificate of completion</span></li>
+                            <li class="flex gap-3"><span class="text-brand-clay select-none">→</span><span>Lifetime access — revisit anytime</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="w-full bg-brand-moss text-brand-sand">
+            <div class="max-w-4xl mx-auto px-6 md:px-10 py-16 md:py-20 text-center">
+                <h2 class="serif text-3xl md:text-4xl mb-4" style="color: #F5F3EE;">Ready to start?</h2>
+                <p class="text-lg opacity-90 mb-8 max-w-2xl mx-auto">Join the course and start building the operational infrastructure your business needs.</p>
+                <a id="enroll-btn-bottom" href="#" class="inline-block bg-brand-clay text-brand-sand px-8 py-4 text-sm tracking-wide hover:bg-brand-sand hover:text-brand-moss transition">
+                    Enroll Now — <span id="price-bottom"></span>
+                </a>
+            </div>
+        </section>
+
+    </div>
+</main>
+
+<footer class="w-full border-t border-brand-divider">
+    <div class="max-w-6xl mx-auto px-6 md:px-10 py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs text-brand-taupe">
+        <p>© <span id="year"></span> Behind The Business.</p>
+        <a href="mailto:tobey@behindthebusiness.net" class="hover:text-brand-clay transition">tobey@behindthebusiness.net</a>
+    </div>
+</footer>
+
+<script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const SUPABASE_URL = 'https://wjndqsqgfmbrakzcagei.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_MQ_1krNKxWTmdC4nEF4eBg_U4ZBYHha';
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const path = window.location.pathname.replace(/\/$/, '');
+    const slug = path.split('/').pop();
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    }
+
+    function showError(msg) {
+        document.getElementById('loading-state').classList.add('hidden');
+        const el = document.getElementById('error-state');
+        el.textContent = msg;
+        el.classList.remove('hidden');
+    }
+
+    const prices = {
+        1: '$497',
+        2: '$997',
+        3: '$1,497',
+        4: '$797'
+    };
+
+    const outcomes = {
+        1: [
+            'A complete inventory of the tools and systems running your business',
+            'A risk register showing where the business is one-person-deep',
+            'A prioritized infrastructure roadmap you can act on immediately',
+            'The confidence to know exactly what to fix and in what order'
+        ],
+        2: [
+            'A clean, structured CRM that reflects how your business actually works',
+            'Data flows audited and fixed — no more information disappearing',
+            'Permission baselines so the right people see the right things',
+            'A stable foundation ready for automation and workflow builds'
+        ],
+        3: [
+            'CRM architecture designed around how work actually flows',
+            'Workflows that route tasks, approvals, and handoffs without you',
+            'Cross-tool automations that don\'t break when someone changes a field',
+            'Process documentation that your team will actually use'
+        ],
+        4: [
+            'Living documentation that stays current as the business evolves',
+            'Operational dashboards that show the business without asking anyone',
+            'A stewardship cadence that prevents systems from rotting',
+            'The practices to keep infrastructure working as the business changes'
+        ]
+    };
+
+    (async () => {
+        const { data: { session } } = await sb.auth.getSession();
+        if (session) {
+            const authLink = document.getElementById('auth-link');
+            authLink.textContent = 'Dashboard';
+            authLink.href = '/dashboard';
+        }
+
+        const { data: course, error } = await sb
+            .from('courses')
+            .select('*')
+            .eq('slug', slug)
+            .single();
+
+        if (error || !course) {
+            showError('Course not found.');
+            return;
+        }
+
+        const courseNum = String(course.course_number).padStart(2, '0');
+        const price = prices[course.course_number] || '$—';
+        const hours = course.total_min ? `~${(course.total_min / 60).toFixed(1).replace('.0', '')} hrs` : '';
+
+        document.title = `${course.title} · Behind The Business`;
+        document.getElementById('course-eyebrow').textContent = `Course ${courseNum} · Self-paced`;
+        document.getElementById('course-title').textContent = course.title;
+        document.getElementById('course-subtitle').textContent = course.subtitle || '';
+        document.getElementById('course-lessons').textContent = `${course.lesson_count} lessons`;
+        document.getElementById('course-hours').textContent = hours;
+        document.getElementById('course-price').textContent = price;
+        document.getElementById('price-bottom').textContent = price;
+
+        const courseOutcomes = outcomes[course.course_number] || [];
+        document.getElementById('course-outcomes').innerHTML = courseOutcomes.map(o =>
+            `<li class="flex gap-2"><span class="text-brand-clay select-none">→</span><span>${escapeHtml(o)}</span></li>`
+        ).join('');
+
+        // Check enrollment
+        let enrolled = false;
+        if (session) {
+            const { data: enrollment } = await sb
+                .from('enrollments')
+                .select('id')
+                .eq('course_id', course.id)
+                .maybeSingle();
+            enrolled = !!enrollment;
+        }
+
+        const enrollBtn = document.getElementById('enroll-btn');
+        const enrollBtnBottom = document.getElementById('enroll-btn-bottom');
+
+        if (enrolled) {
+            enrollBtn.textContent = 'Go to Course →';
+            enrollBtn.href = `/courses/${course.slug}`;
+            enrollBtnBottom.textContent = 'Go to Course →';
+            enrollBtnBottom.href = `/courses/${course.slug}`;
+        } else if (session) {
+            enrollBtn.textContent = `Enroll Now — ${price}`;
+            enrollBtn.href = `mailto:tobey@behindthebusiness.net?subject=Enroll%20—%20${encodeURIComponent(course.title)}`;
+            enrollBtnBottom.href = enrollBtn.href;
+        } else {
+            enrollBtn.textContent = `Enroll Now — ${price}`;
+            enrollBtn.href = '/login';
+            enrollBtnBottom.href = '/login';
+        }
+
+        // Load lessons
+        const { data: lessons } = await sb
+            .from('lessons')
+            .select('lesson_number, title, duration_min')
+            .eq('course_id', course.id)
+            .order('sort_order', { ascending: true });
+
+        const lessonList = document.getElementById('lesson-list');
+        document.getElementById('curriculum-summary').textContent =
+            `${course.lesson_count} lessons${hours ? ' · ' + hours + ' total' : ''} · Work through at your own pace.`;
+
+        if (lessons && lessons.length > 0) {
+            lessonList.innerHTML = lessons.map(l => {
+                const num = String(l.lesson_number).padStart(2, '0');
+                return `
+                    <div class="flex items-center gap-4 px-5 py-4 bg-brand-sand border border-brand-divider">
+                        <span class="text-xs font-medium text-brand-clay min-w-[24px]">${num}</span>
+                        <span class="flex-1 text-sm">${escapeHtml(l.title)}</span>
+                        <span class="text-xs text-brand-taupe">${l.duration_min} min</span>
+                    </div>
+                `;
+            }).join('');
+        } else {
+            lessonList.innerHTML = '<p class="text-sm text-brand-taupe">Curriculum coming soon.</p>';
+        }
+
+        document.getElementById('loading-state').classList.add('hidden');
+        document.getElementById('preview-content').classList.remove('hidden');
+    })();
+</script>
+
+</body>
+</html>

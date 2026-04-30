@@ -1,5 +1,8 @@
 {
     "rewrites": [
-        { "source": "/courses/:slug", "destination": "/course-player.html" }
+        { "source": "/profile", "destination": "/profile.html" },
+        { "source": "/course/:slug", "destination": "/course-preview.html" },
+        { "source": "/courses/:slug", "destination": "/course-player.html" },
+        { "source": "/admin", "destination": "/admin.html" }
     ]
 }

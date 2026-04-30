@@ -37,6 +37,8 @@
         </a>
         <div class="flex items-center gap-5">
             <span id="user-email" class="hidden md:inline-block text-sm text-brand-taupe"></span>
+            <a href="/profile" class="text-sm text-brand-taupe hover:text-brand-clay transition">Profile</a>
+            <a href="/admin" id="admin-link" class="hidden text-sm text-brand-clay hover:text-brand-moss transition">Admin</a>
             <a href="#" id="signout-link" class="text-sm text-brand-moss hover:text-brand-clay transition">Sign out</a>
         </div>
     </div>
@@ -85,8 +87,12 @@
         }
         const email = session.user.email;
         document.getElementById('user-email').textContent = email;
-        const greetingName = ', ' + (email.split('@')[0] || '').replace(/[._-]/g, ' ');
-        document.getElementById('user-name-greeting').textContent = greetingName;
+
+        const { data: profile } = await sb.from('profiles').select('full_name, is_admin').eq('id', session.user.id).maybeSingle();
+        if (profile && profile.is_admin) document.getElementById('admin-link').classList.remove('hidden');
+        const displayName = (profile && profile.full_name) ? profile.full_name.split(' ')[0] : (email.split('@')[0] || '').replace(/[._-]/g, ' ');
+        document.getElementById('user-name-greeting').textContent = ', ' + displayName;
+
         await Promise.all([loadCourses(), loadCertificates()]);
     })();
 

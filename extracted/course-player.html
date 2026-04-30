@@ -70,18 +70,44 @@
 
             <div class="grid lg:grid-cols-[1fr_320px] gap-10">
 
-                <div>
-                    <div class="bg-brand-moss aspect-video flex items-center justify-center mb-8">
-                        <video id="lesson-video" controls preload="metadata" class="w-full h-full">
-                            <source id="lesson-video-source" src="" type="video/mp4">
-                            Your browser does not support video playback.
-                        </video>
+                <div class="order-2 lg:order-1">
+                    <div id="video-container" class="bg-brand-moss aspect-video flex items-center justify-center mb-8">
                     </div>
 
                     <p id="lesson-eyebrow" class="eyebrow mb-2"></p>
                     <h2 id="lesson-title" class="serif text-2xl md:text-3xl mb-5"></h2>
                     <div class="text-brand-taupe leading-relaxed space-y-4">
                         <p id="lesson-description"></p>
+                    </div>
+
+                    <!-- Quiz section -->
+                    <div id="quiz-section" class="hidden mt-10 pt-6 border-t border-brand-divider">
+                        <p class="eyebrow mb-3">Lesson Quiz</p>
+                        <h3 id="quiz-title" class="serif text-xl mb-6"></h3>
+                        <div id="quiz-questions" class="space-y-6"></div>
+                        <div id="quiz-result" class="hidden mt-6 p-5 border border-brand-divider"></div>
+                        <button id="quiz-submit" class="mt-6 bg-brand-moss text-brand-sand px-6 py-3 text-sm tracking-wide hover:bg-brand-clay transition disabled:opacity-50 disabled:cursor-not-allowed">
+                            Submit Answers
+                        </button>
+                        <div id="quiz-past" class="hidden mt-4 text-xs text-brand-taupe"></div>
+                    </div>
+
+                    <!-- Discussion section -->
+                    <div id="discussion-section" class="mt-10 pt-6 border-t border-brand-divider">
+                        <div class="flex items-center justify-between mb-5">
+                            <p class="eyebrow">Discussion</p>
+                            <span id="comment-count" class="text-xs text-brand-taupe"></span>
+                        </div>
+                        <form id="comment-form" class="mb-6">
+                            <textarea id="comment-input" rows="3" placeholder="Ask a question or share your thoughts…"
+                                class="w-full px-4 py-3 border border-brand-divider bg-white text-sm text-brand-moss focus:border-brand-clay transition resize-none" style="outline:none"></textarea>
+                            <div class="flex items-center justify-between mt-2">
+                                <span id="reply-indicator" class="hidden text-xs text-brand-taupe">Replying to <strong id="reply-to-name"></strong> <button type="button" onclick="cancelReply()" class="text-brand-clay ml-1">✕</button></span>
+                                <span></span>
+                                <button type="submit" class="btn-comment bg-brand-moss text-brand-sand px-5 py-2 text-sm tracking-wide hover:bg-brand-clay transition disabled:opacity-50 disabled:cursor-not-allowed">Post</button>
+                            </div>
+                        </form>
+                        <div id="comments-list" class="space-y-4"></div>
                     </div>
 
                     <div class="mt-10 pt-6 border-t border-brand-divider flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -100,16 +126,23 @@
                     </div>
                 </div>
 
-                <aside class="lg:sticky lg:top-6 lg:self-start">
+                <aside class="order-1 lg:order-2 lg:sticky lg:top-6 lg:self-start">
                     <div class="border border-brand-divider bg-brand-sand">
-                        <div class="px-5 py-4 border-b border-brand-divider">
+                        <button id="sidebar-toggle" class="lg:hidden w-full px-5 py-4 border-b border-brand-divider flex items-center justify-between text-left" aria-expanded="false">
+                            <div>
+                                <p class="eyebrow mb-1">Course outline</p>
+                                <p id="sidebar-progress-text-mobile" class="text-xs text-brand-taupe"></p>
+                            </div>
+                            <span id="sidebar-arrow" class="text-brand-taupe text-lg transition-transform">▼</span>
+                        </button>
+                        <div class="hidden lg:block px-5 py-4 border-b border-brand-divider">
                             <p class="eyebrow mb-1">Course outline</p>
                             <p id="sidebar-progress-text" class="text-xs text-brand-taupe"></p>
                             <div class="w-full h-1 bg-brand-divider overflow-hidden mt-3">
                                 <div id="sidebar-progress-bar" class="h-full bg-brand-clay" style="width: 0%"></div>
                             </div>
                         </div>
-                        <ul id="lesson-list" class="text-sm"></ul>
+                        <ul id="lesson-list" class="text-sm hidden lg:block"></ul>
                     </div>
                 </aside>
 
@@ -153,6 +186,165 @@
     function escapeHtml(s) {
         return String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
     }
+
+    function getYouTubeId(url) {
+        if (!url) return null;
+        const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+        return m ? m[1] : null;
+    }
+
+    let currentVideoSrc = '';
+    function renderVideo(src) {
+        if (src === currentVideoSrc) return;
+        currentVideoSrc = src;
+        const container = document.getElementById('video-container');
+        const ytId = getYouTubeId(src);
+        if (ytId) {
+            container.innerHTML = `<iframe src="https://www.youtube.com/embed/${ytId}" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+        } else if (src) {
+            container.innerHTML = `<video controls preload="metadata" class="w-full h-full"><source src="${escapeHtml(src)}" type="video/mp4">Your browser does not support video playback.</video>`;
+        } else {
+            container.innerHTML = `<p class="text-brand-sand text-sm">No video available for this lesson.</p>`;
+        }
+    }
+
+    let currentQuiz = null;
+    let currentQuestions = [];
+
+    async function loadQuiz(lessonId) {
+        const section = document.getElementById('quiz-section');
+        const questionsEl = document.getElementById('quiz-questions');
+        const resultEl = document.getElementById('quiz-result');
+        const submitBtn = document.getElementById('quiz-submit');
+        const pastEl = document.getElementById('quiz-past');
+
+        section.classList.add('hidden');
+        resultEl.classList.add('hidden');
+        pastEl.classList.add('hidden');
+        currentQuiz = null;
+        currentQuestions = [];
+
+        const { data: quiz } = await sb
+            .from('quizzes')
+            .select('*')
+            .eq('lesson_id', lessonId)
+            .maybeSingle();
+
+        if (!quiz) return;
+        currentQuiz = quiz;
+
+        const { data: questions } = await sb
+            .from('quiz_questions')
+            .select('*, options:quiz_options(*)')
+            .eq('quiz_id', quiz.id)
+            .order('sort_order', { ascending: true });
+
+        if (!questions || questions.length === 0) return;
+        currentQuestions = questions;
+
+        document.getElementById('quiz-title').textContent = quiz.title;
+
+        questionsEl.innerHTML = questions.map((q, qi) => {
+            const opts = (q.options || []).sort((a, b) => a.sort_order - b.sort_order);
+            return `
+                <div class="quiz-question" data-question-id="${q.id}">
+                    <p class="text-sm font-medium mb-3">${qi + 1}. ${escapeHtml(q.question_text)}</p>
+                    <div class="space-y-2">
+                        ${opts.map(o => `
+                            <label class="flex items-start gap-3 px-4 py-3 border border-brand-divider bg-white cursor-pointer hover:border-brand-clay transition quiz-option" data-option-id="${o.id}">
+                                <input type="radio" name="q-${q.id}" value="${o.id}" class="mt-0.5" />
+                                <span class="text-sm">${escapeHtml(o.option_text)}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // Show past attempts
+        const { data: attempts } = await sb
+            .from('quiz_attempts')
+            .select('score, total, passed, attempted_at')
+            .eq('quiz_id', quiz.id)
+            .order('attempted_at', { ascending: false })
+            .limit(1);
+
+        if (attempts && attempts.length > 0) {
+            const a = attempts[0];
+            const pct = Math.round((a.score / a.total) * 100);
+            const date = new Date(a.attempted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            pastEl.textContent = `Last attempt: ${a.score}/${a.total} (${pct}%) on ${date} — ${a.passed ? 'Passed' : 'Not passed'}`;
+            pastEl.classList.remove('hidden');
+        }
+
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Answers';
+        section.classList.remove('hidden');
+    }
+
+    document.getElementById('quiz-submit').addEventListener('click', async () => {
+        if (!currentQuiz || currentQuestions.length === 0) return;
+        const submitBtn = document.getElementById('quiz-submit');
+        const resultEl = document.getElementById('quiz-result');
+
+        let score = 0;
+        const total = currentQuestions.length;
+        let allAnswered = true;
+
+        currentQuestions.forEach(q => {
+            const selected = document.querySelector(`input[name="q-${q.id}"]:checked`);
+            if (!selected) { allAnswered = false; return; }
+            const selectedId = selected.value;
+            const correct = (q.options || []).find(o => o.is_correct);
+            const questionEl = document.querySelector(`[data-question-id="${q.id}"]`);
+
+            // Highlight answers
+            questionEl.querySelectorAll('.quiz-option').forEach(opt => {
+                const optId = opt.getAttribute('data-option-id');
+                if (correct && optId === correct.id) {
+                    opt.classList.add('border-green-500', 'bg-green-50');
+                } else if (optId === selectedId && (!correct || optId !== correct.id)) {
+                    opt.classList.add('border-red-400', 'bg-red-50');
+                }
+            });
+
+            if (correct && selectedId === correct.id) score++;
+        });
+
+        if (!allAnswered) {
+            resultEl.innerHTML = '<p class="text-sm text-red-700">Please answer all questions before submitting.</p>';
+            resultEl.classList.remove('hidden');
+            return;
+        }
+
+        // Disable inputs
+        document.querySelectorAll('#quiz-questions input[type="radio"]').forEach(r => r.disabled = true);
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitted';
+
+        const pct = Math.round((score / total) * 100);
+        const passed = pct >= currentQuiz.passing_score;
+
+        // Save attempt
+        await sb.from('quiz_attempts').insert({
+            user_id: userId,
+            quiz_id: currentQuiz.id,
+            score,
+            total,
+            passed
+        });
+
+        const color = passed ? 'green' : 'red';
+        resultEl.innerHTML = `
+            <p class="text-lg font-medium ${passed ? 'text-green-800' : 'text-red-700'} mb-1">
+                ${passed ? 'Passed!' : 'Not quite.'} ${score}/${total} correct (${pct}%)
+            </p>
+            <p class="text-sm text-brand-taupe">
+                ${passed ? 'Great work — you\'ve demonstrated understanding of this lesson.' : `You need ${currentQuiz.passing_score}% to pass. Review the lesson and try again.`}
+            </p>
+        `;
+        resultEl.classList.remove('hidden');
+    });
 
     async function issueCertificate() {
         const { data: existing } = await sb.from('certificates')
@@ -279,6 +471,8 @@
             `Lesson ${lessonIdx} of ${total} · ${pct}% complete`;
         document.getElementById('sidebar-progress-text').textContent =
             `${done} of ${total} lessons complete`;
+        document.getElementById('sidebar-progress-text-mobile').textContent =
+            `${done} of ${total} lessons complete · ${pct}%`;
         document.getElementById('sidebar-progress-bar').style.width = pct + '%';
     }
 
@@ -322,19 +516,16 @@
         document.getElementById('lesson-eyebrow').textContent = `Lesson ${num}`;
         document.getElementById('lesson-title').textContent = l.title;
         document.getElementById('lesson-description').textContent = l.description || '';
-        const video = document.getElementById('lesson-video');
-        const source = document.getElementById('lesson-video-source');
-        const newSrc = l.video_path || '';
-        if (source.src !== window.location.origin + newSrc) {
-            source.src = newSrc;
-            video.load();
-        }
+        renderVideo(l.video_path || '');
         const checkbox = document.getElementById('complete-checkbox');
         checkbox.checked = !!progressByLesson[l.id];
 
         const idx = lessons.indexOf(l);
         document.getElementById('prev-lesson').disabled = idx === 0;
         document.getElementById('next-lesson').disabled = idx === lessons.length - 1;
+        loadQuiz(l.id);
+        loadComments(l.id);
+        cancelReply();
     }
 
     document.getElementById('complete-checkbox').addEventListener('change', async e => {
@@ -383,6 +574,146 @@
         await sb.auth.signOut();
         window.location.href = '/';
     });
+
+    // ── Sidebar toggle (mobile) ──
+    document.getElementById('sidebar-toggle').addEventListener('click', () => {
+        const list = document.getElementById('lesson-list');
+        const arrow = document.getElementById('sidebar-arrow');
+        const expanded = !list.classList.contains('hidden');
+        if (expanded) {
+            list.classList.add('hidden');
+            arrow.style.transform = '';
+        } else {
+            list.classList.remove('hidden');
+            arrow.style.transform = 'rotate(180deg)';
+        }
+    });
+
+    // ── Discussion ──
+    let replyToId = null;
+    let profileCache = {};
+
+    async function getProfileName(uid) {
+        if (profileCache[uid]) return profileCache[uid];
+        const { data } = await sb.from('profiles').select('full_name').eq('id', uid).maybeSingle();
+        const name = (data && data.full_name) ? data.full_name : 'Student';
+        profileCache[uid] = name;
+        return name;
+    }
+
+    function timeAgo(dateStr) {
+        const diff = Date.now() - new Date(dateStr).getTime();
+        const mins = Math.floor(diff / 60000);
+        if (mins < 1) return 'just now';
+        if (mins < 60) return mins + 'm ago';
+        const hrs = Math.floor(mins / 60);
+        if (hrs < 24) return hrs + 'h ago';
+        const days = Math.floor(hrs / 24);
+        if (days < 30) return days + 'd ago';
+        return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    async function loadComments(lessonId) {
+        const { data: comments } = await sb
+            .from('lesson_comments')
+            .select('*')
+            .eq('lesson_id', lessonId)
+            .order('created_at', { ascending: true });
+
+        const list = comments || [];
+        document.getElementById('comment-count').textContent = list.length > 0 ? list.length + ' comment' + (list.length !== 1 ? 's' : '') : '';
+
+        if (list.length === 0) {
+            document.getElementById('comments-list').innerHTML = '<p class="text-sm text-brand-taupe">No comments yet. Be the first to start the discussion.</p>';
+            return;
+        }
+
+        const uids = [...new Set(list.map(c => c.user_id))];
+        await Promise.all(uids.map(uid => getProfileName(uid)));
+
+        const topLevel = list.filter(c => !c.parent_id);
+        const replies = list.filter(c => c.parent_id);
+        const replyMap = {};
+        replies.forEach(r => {
+            if (!replyMap[r.parent_id]) replyMap[r.parent_id] = [];
+            replyMap[r.parent_id].push(r);
+        });
+
+        document.getElementById('comments-list').innerHTML = topLevel.map(c => renderComment(c, replyMap[c.id] || [])).join('');
+    }
+
+    function renderComment(c, replies) {
+        const name = profileCache[c.user_id] || 'Student';
+        const isOwn = c.user_id === userId;
+        const replyHtml = replies.map(r => {
+            const rName = profileCache[r.user_id] || 'Student';
+            const rIsOwn = r.user_id === userId;
+            return `<div class="ml-6 mt-3 pl-4 border-l-2 border-brand-divider">
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="text-sm font-medium">${escapeHtml(rName)}</span>
+                    <span class="text-xs text-brand-taupe">${timeAgo(r.created_at)}</span>
+                    ${rIsOwn ? `<button onclick="deleteComment('${r.id}')" class="text-xs text-red-500 hover:text-red-700 ml-auto">Delete</button>` : ''}
+                </div>
+                <p class="text-sm text-brand-taupe leading-relaxed">${escapeHtml(r.content)}</p>
+            </div>`;
+        }).join('');
+
+        return `<div class="p-4 border border-brand-divider bg-white">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="text-sm font-medium">${escapeHtml(name)}</span>
+                <span class="text-xs text-brand-taupe">${timeAgo(c.created_at)}</span>
+                <div class="ml-auto flex items-center gap-3">
+                    <button onclick="startReply('${c.id}', '${escapeHtml(name)}')" class="text-xs text-brand-clay hover:text-brand-moss">Reply</button>
+                    ${isOwn ? `<button onclick="deleteComment('${c.id}')" class="text-xs text-red-500 hover:text-red-700">Delete</button>` : ''}
+                </div>
+            </div>
+            <p class="text-sm text-brand-taupe leading-relaxed">${escapeHtml(c.content)}</p>
+            ${replyHtml}
+        </div>`;
+    }
+
+    function startReply(commentId, name) {
+        replyToId = commentId;
+        document.getElementById('reply-indicator').classList.remove('hidden');
+        document.getElementById('reply-to-name').textContent = name;
+        document.getElementById('comment-input').focus();
+    }
+
+    function cancelReply() {
+        replyToId = null;
+        document.getElementById('reply-indicator').classList.add('hidden');
+    }
+
+    document.getElementById('comment-form').addEventListener('submit', async e => {
+        e.preventDefault();
+        const input = document.getElementById('comment-input');
+        const content = input.value.trim();
+        if (!content) return;
+
+        const btn = e.target.querySelector('button[type="submit"]');
+        btn.disabled = true;
+
+        const payload = {
+            lesson_id: currentLessonId,
+            user_id: userId,
+            content: content,
+        };
+        if (replyToId) payload.parent_id = replyToId;
+
+        const { error } = await sb.from('lesson_comments').insert(payload);
+        if (error) { console.error(error); btn.disabled = false; return; }
+
+        input.value = '';
+        cancelReply();
+        btn.disabled = false;
+        loadComments(currentLessonId);
+    });
+
+    async function deleteComment(id) {
+        if (!confirm('Delete this comment?')) return;
+        await sb.from('lesson_comments').delete().eq('id', id);
+        loadComments(currentLessonId);
+    }
 </script>
 
 </body>

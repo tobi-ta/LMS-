@@ -162,15 +162,18 @@
                 return;
             }
 
+            const { data: profile } = await sb.from('profiles').select('full_name').eq('id', cert.user_id).maybeSingle();
             const { data: { user } } = await sb.auth.getUser();
-            let recipientEmail = '';
-            if (user && user.id === cert.user_id) {
-                recipientEmail = user.email;
+            let recipientName = '';
+            if (profile && profile.full_name) {
+                recipientName = profile.full_name;
+            } else if (user && user.id === cert.user_id) {
+                recipientName = user.email;
             } else {
-                recipientEmail = 'Verified Certificate Holder';
+                recipientName = 'Verified Certificate Holder';
             }
 
-            document.getElementById('cert-recipient').textContent = recipientEmail;
+            document.getElementById('cert-recipient').textContent = recipientName;
             document.getElementById('cert-course').textContent = cert.course.title;
 
             const courseNum = String(cert.course.course_number).padStart(2, '0');

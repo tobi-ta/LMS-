@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin · Behind The Business</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" type="image/png" href="/btb-favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script>
+        window.tailwind.config = {
+            theme: { extend: {
+                fontFamily: { serif: ['Playfair Display', 'serif'], sans: ['Inter', 'sans-serif'] },
+                colors: { brand: { sand: '#F5F3EE', moss: '#2F3E34', taupe: '#6B6A67', clay: '#B66A4A', divider: '#DEDAD4' }},
+            }},
+        };
+    </script>
+    <style>
+        html { font-size: 17px; }
+        body { font-family: 'Inter', sans-serif; background-color: #F5F3EE; color: #2F3E34; margin: 0; -webkit-font-smoothing: antialiased; }
+        h1, h2, h3, h4, .serif { font-family: 'Playfair Display', serif; font-weight: 400; color: #2F3E34; }
+        .grain::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; opacity: 0.03; background-image: url("https://grainy-gradients.vercel.app/noise.svg"); }
+        .eyebrow { font-family: 'Inter', sans-serif; text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.75rem; font-weight: 500; color: #B66A4A; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #B66A4A; }
+        .tab-btn { padding: 0.5rem 0.75rem; font-size: 0.8rem; border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        @media (min-width: 768px) { .tab-btn { padding: 0.5rem 1rem; font-size: 0.875rem; } }
+        .tab-btn:hover { color: #B66A4A; }
+        .tab-btn.active { border-bottom-color: #B66A4A; color: #B66A4A; font-weight: 500; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: #6B6A67; padding: 0.75rem 1rem; border-bottom: 1px solid #DEDAD4; }
+        td { padding: 0.75rem 1rem; border-bottom: 1px solid #DEDAD4; font-size: 0.875rem; }
+        tr:hover td { background-color: rgba(0,0,0,0.015); }
+        .btn { padding: 0.5rem 1rem; font-size: 0.8rem; letter-spacing: 0.05em; cursor: pointer; transition: all 0.2s; border: none; }
+        .btn-primary { background-color: #2F3E34; color: #F5F3EE; }
+        .btn-primary:hover { background-color: #B66A4A; }
+        .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.75rem; }
+        .btn-danger { background-color: #dc2626; color: white; }
+        .btn-danger:hover { background-color: #b91c1c; }
+        .btn-outline { background: transparent; border: 1px solid #2F3E34; color: #2F3E34; }
+        .btn-outline:hover { background-color: #2F3E34; color: #F5F3EE; }
+        .modal-overlay { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); }
+        .modal-box { background: #F5F3EE; max-width: 32rem; width: 100%; margin: 1rem; padding: 2rem; max-height: 90vh; overflow-y: auto; }
+        .form-label { display: block; font-size: 0.8rem; margin-bottom: 0.35rem; color: #6B6A67; }
+        .form-input { width: 100%; padding: 0.6rem 0.75rem; border: 1px solid #DEDAD4; background: white; font-size: 0.875rem; color: #2F3E34; }
+        .stat-card { background: white; border: 1px solid #DEDAD4; padding: 1.5rem; }
+        .stat-num { font-size: 2rem; font-weight: 600; color: #2F3E34; }
+        .stat-label { font-size: 0.8rem; color: #6B6A67; margin-top: 0.25rem; }
+    </style>
+</head>
+<body class="grain min-h-screen flex flex-col">
+
+<header class="w-full border-b border-brand-divider">
+    <div class="max-w-7xl mx-auto px-6 md:px-10 py-5 flex items-center justify-between">
+        <div class="flex items-center gap-6">
+            <a href="/dashboard" class="text-sm text-brand-taupe hover:text-brand-moss transition">← Dashboard</a>
+            <a href="/" class="hidden md:flex items-center gap-3">
+                <img src="/btb-logo.png" alt="Behind The Business" width="32" height="32" />
+                <span class="serif text-base tracking-tight">Behind The Business</span>
+            </a>
+        </div>
+        <div class="flex items-center gap-5">
+            <span class="eyebrow text-xs">Admin Panel</span>
+            <a href="#" id="signout-link" class="text-sm text-brand-moss hover:text-brand-clay transition">Sign out</a>
+        </div>
+    </div>
+</header>
+
+<main class="flex-1 w-full">
+    <div class="max-w-7xl mx-auto px-6 md:px-10 py-8 md:py-12">
+
+        <div id="loading-state" class="text-sm text-brand-taupe">Checking access…</div>
+
+        <div id="denied-state" class="hidden text-center py-20">
+            <h1 class="serif text-3xl mb-3">Access Denied</h1>
+            <p class="text-brand-taupe mb-6">You don't have admin privileges.</p>
+            <a href="/dashboard" class="btn btn-primary">Go to Dashboard</a>
+        </div>
+
+        <div id="admin-content" class="hidden">
+            <div class="mb-8">
+                <h1 class="serif text-3xl md:text-4xl mb-2">Admin Panel</h1>
+                <p class="text-brand-taupe text-sm">Manage your courses, lessons, students, and quizzes.</p>
+            </div>
+
+            <nav class="flex gap-1 border-b border-brand-divider mb-8 overflow-x-auto">
+                <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+                <button class="tab-btn" data-tab="courses">Courses</button>
+                <button class="tab-btn" data-tab="lessons">Lessons</button>
+                <button class="tab-btn" data-tab="students">Students</button>
+                <button class="tab-btn" data-tab="quizzes">Quiz Results</button>
+                <button class="tab-btn" data-tab="settings">Settings</button>
+            </nav>
+
+            <!-- Dashboard Tab -->
+            <div id="tab-dashboard">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div class="stat-card"><div class="stat-num" id="stat-courses">–</div><div class="stat-label">Courses</div></div>
+                    <div class="stat-card"><div class="stat-num" id="stat-lessons">–</div><div class="stat-label">Lessons</div></div>
+                    <div class="stat-card"><div class="stat-num" id="stat-students">–</div><div class="stat-label">Students</div></div>
+                    <div class="stat-card"><div class="stat-num" id="stat-enrollments">–</div><div class="stat-label">Enrollments</div></div>
+                </div>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="serif text-xl mb-3">Recent Enrollments</h3>
+                        <div id="recent-enrollments" class="text-sm text-brand-taupe">Loading…</div>
+                    </div>
+                    <div>
+                        <h3 class="serif text-xl mb-3">Recent Quiz Attempts</h3>
+                        <div id="recent-quizzes" class="text-sm text-brand-taupe">Loading…</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Courses Tab -->
+            <div id="tab-courses" class="hidden">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="serif text-2xl">Courses</h2>
+                    <button class="btn btn-primary" onclick="showCourseForm()">+ Add Course</button>
+                </div>
+                <div class="bg-white border border-brand-divider overflow-x-auto">
+                    <table>
+                        <thead><tr><th>#</th><th>Title</th><th>Slug</th><th>Lessons</th><th>Actions</th></tr></thead>
+                        <tbody id="courses-tbody"><tr><td colspan="5" class="text-brand-taupe">Loading…</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Lessons Tab -->
+            <div id="tab-lessons" class="hidden">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div class="flex items-center gap-4">
+                        <h2 class="serif text-2xl">Lessons</h2>
+                        <select id="lesson-course-select" class="form-input" style="width:auto">
+                            <option value="">Select a course…</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="add-lesson-btn" onclick="showLessonForm()" disabled>+ Add Lesson</button>
+                </div>
+                <div class="bg-white border border-brand-divider overflow-x-auto">
+                    <table>
+                        <thead><tr><th>#</th><th>Title</th><th>Duration</th><th>Video</th><th>Actions</th></tr></thead>
+                        <tbody id="lessons-tbody"><tr><td colspan="5" class="text-brand-taupe">Select a course above</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Students Tab -->
+            <div id="tab-students" class="hidden">
+                <h2 class="serif text-2xl mb-6">Students</h2>
+                <div class="bg-white border border-brand-divider overflow-x-auto">
+                    <table>
+                        <thead><tr><th>Name</th><th>Email</th><th>Enrolled Courses</th><th>Progress</th><th>Joined</th><th>Actions</th></tr></thead>
+                        <tbody id="students-tbody"><tr><td colspan="6" class="text-brand-taupe">Loading…</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Quiz Results Tab -->
+            <div id="tab-quizzes" class="hidden">
+                <h2 class="serif text-2xl mb-6">Quiz Results</h2>
+                <div class="bg-white border border-brand-divider overflow-x-auto">
+                    <table>
+                        <thead><tr><th>Student</th><th>Quiz</th><th>Score</th><th>Result</th><th>Date</th></tr></thead>
+                        <tbody id="quizzes-tbody"><tr><td colspan="5" class="text-brand-taupe">Loading…</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="tab-settings" class="hidden">
+                <h2 class="serif text-2xl mb-6">Email Settings</h2>
+                <div class="bg-white border border-brand-divider p-6 max-w-lg">
+                    <form id="settings-form" class="space-y-5">
+                        <div>
+                            <label class="form-label">Resend API Key</label>
+                            <input type="password" id="cfg-resend-key" class="form-input" placeholder="re_xxxx…" />
+                            <p class="text-xs text-brand-taupe mt-1">Get yours at resend.com</p>
+                        </div>
+                        <div>
+                            <label class="form-label">From Address</label>
+                            <input type="text" id="cfg-email-from" class="form-input" placeholder="Behind The Business <onboarding@resend.dev>" />
+                            <p class="text-xs text-brand-taupe mt-1">Use onboarding@resend.dev for testing, or verify your own domain on Resend.</p>
+                        </div>
+                        <div>
+                            <label class="form-label">Site URL</label>
+                            <input type="text" id="cfg-site-url" class="form-input" placeholder="https://lsm-rho.vercel.app" />
+                            <p class="text-xs text-brand-taupe mt-1">Used for links in email templates.</p>
+                        </div>
+                        <div id="settings-msg" class="hidden text-sm px-4 py-3"></div>
+                        <button type="submit" class="btn btn-primary">Save Settings</button>
+                    </form>
+                    <div class="mt-6 pt-6 border-t border-brand-divider">
+                        <h3 class="text-sm font-medium mb-3">Test Email</h3>
+                        <div class="flex gap-3">
+                            <input type="email" id="test-email-to" class="form-input flex-1" placeholder="recipient@example.com" />
+                            <button class="btn btn-outline" id="test-email-btn" onclick="sendTestEmail()">Send Test</button>
+                        </div>
+                        <div id="test-email-msg" class="hidden text-sm mt-3 px-4 py-3"></div>
+                    </div>
+                </div>
+                <div class="mt-8 max-w-lg">
+                    <h3 class="serif text-xl mb-3">How it works</h3>
+                    <div class="text-sm text-brand-taupe space-y-2">
+                        <p>Emails are sent automatically when:</p>
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li><strong>Enrollment</strong> — student gets a welcome email with a link to the course</li>
+                            <li><strong>Certificate</strong> — student gets a congratulations email with their certificate link</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div id="modal-container"></div>
+
+<footer class="w-full border-t border-brand-divider">
+    <div class="max-w-7xl mx-auto px-6 md:px-10 py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs text-brand-taupe">
+        <p>&copy; <span id="year"></span> Behind The Business.</p>
+        <a href="mailto:tobey@behindthebusiness.net" class="hover:text-brand-clay transition">tobey@behindthebusiness.net</a>
+    </div>
+</footer>
+
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+
+const SUPABASE_URL = 'https://wjndqsqgfmbrakzcagei.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_MQ_1krNKxWTmdC4nEF4eBg_U4ZBYHha';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let userId = null;
+let courses = [];
+let users = [];
+let enrollments = [];
+let selectedCourseId = null;
+
+function esc(s) {
+    return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function slugify(text) {
+    return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
+function fmtDate(d) {
+    if (!d) return '–';
+    return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+// ── Auth & Admin Check ──
+(async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = '/login'; return; }
+    userId = session.user.id;
+
+    const { data: profile } = await sb.from('profiles').select('is_admin').eq('id', userId).maybeSingle();
+    document.getElementById('loading-state').classList.add('hidden');
+
+    if (!profile || !profile.is_admin) {
+        document.getElementById('denied-state').classList.remove('hidden');
+        return;
+    }
+
+    document.getElementById('admin-content').classList.remove('hidden');
+    loadDashboard();
+})();
+
+// ── Sign Out ──
+document.getElementById('signout-link').addEventListener('click', async e => {
+    e.preventDefault();
+    await sb.auth.signOut();
+    window.location.href = '/';
+});
+
+// ── Tab Navigation ──
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const tab = btn.getAttribute('data-tab');
+        document.querySelectorAll('[id^="tab-"]').forEach(el => el.classList.add('hidden'));
+        document.getElementById('tab-' + tab).classList.remove('hidden');
+
+        if (tab === 'dashboard') loadDashboard();
+        else if (tab === 'courses') loadCourses();
+        else if (tab === 'lessons') loadCoursesForSelect();
+        else if (tab === 'students') loadStudents();
+        else if (tab === 'quizzes') loadQuizResults();
+        else if (tab === 'settings') loadSettings();
+    });
+});
+
+// ── Modal Helpers ──
+function showModal(title, bodyHtml, onSubmit) {
+    const container = document.getElementById('modal-container');
+    container.innerHTML = `
+        <div class="modal-overlay" id="modal-overlay">
+            <div class="modal-box">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="serif text-xl">${title}</h3>
+                    <button onclick="closeModal()" class="text-brand-taupe hover:text-brand-moss text-xl leading-none">&times;</button>
+                </div>
+                <form id="modal-form" class="space-y-4">
+                    ${bodyHtml}
+                    <div id="modal-error" class="hidden text-sm text-red-700 bg-red-50 border border-red-200 px-4 py-3"></div>
+                    <div class="flex gap-3 pt-2">
+                        <button type="submit" class="btn btn-primary flex-1">Save</button>
+                        <button type="button" onclick="closeModal()" class="btn btn-outline flex-1">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    `;
+    document.getElementById('modal-form').addEventListener('submit', async e => {
+        e.preventDefault();
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Saving…';
+        try {
+            await onSubmit(e);
+        } catch (err) {
+            const errEl = document.getElementById('modal-error');
+            errEl.textContent = err.message || 'Something went wrong';
+            errEl.classList.remove('hidden');
+        }
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Save';
+    });
+}
+
+function closeModal() {
+    document.getElementById('modal-container').innerHTML = '';
+}
+
+function modalError(msg) {
+    const el = document.getElementById('modal-error');
+    el.textContent = msg;
+    el.classList.remove('hidden');
+}
+
+// ═══════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════
+async function loadDashboard() {
+    const [coursesRes, lessonsRes, enrollRes, usersRes, attemptsRes] = await Promise.all([
+        sb.from('courses').select('id', { count: 'exact', head: true }),
+        sb.from('lessons').select('id', { count: 'exact', head: true }),
+        sb.from('enrollments').select('*'),
+        sb.rpc('admin_get_users'),
+        sb.from('quiz_attempts').select('*, profiles:user_id(full_name)').order('attempted_at', { ascending: false }).limit(5),
+    ]);
+
+    document.getElementById('stat-courses').textContent = coursesRes.count || 0;
+    document.getElementById('stat-lessons').textContent = lessonsRes.count || 0;
+    document.getElementById('stat-students').textContent = usersRes.data ? usersRes.data.length : 0;
+    document.getElementById('stat-enrollments').textContent = enrollRes.data ? enrollRes.data.length : 0;
+
+    // Recent enrollments
+    if (enrollRes.data && enrollRes.data.length > 0) {
+        const allCourses = (await sb.from('courses').select('id, title')).data || [];
+        const courseMap = {};
+        allCourses.forEach(c => courseMap[c.id] = c.title);
+        const userMap = {};
+        if (usersRes.data) usersRes.data.forEach(u => userMap[u.id] = u.email);
+
+        const recent = enrollRes.data.sort((a, b) => new Date(b.enrolled_at) - new Date(a.enrolled_at)).slice(0, 5);
+        document.getElementById('recent-enrollments').innerHTML = `<div class="space-y-2">${recent.map(e =>
+            `<div class="flex justify-between py-2 border-b border-brand-divider">
+                <span>${esc(userMap[e.user_id] || 'Unknown')}</span>
+                <span class="text-brand-taupe">${esc(courseMap[e.course_id] || '?')} · ${fmtDate(e.enrolled_at)}</span>
+            </div>`
+        ).join('')}</div>`;
+    } else {
+        document.getElementById('recent-enrollments').textContent = 'No enrollments yet.';
+    }
+
+    // Recent quiz attempts
+    if (attemptsRes.data && attemptsRes.data.length > 0) {
+        document.getElementById('recent-quizzes').innerHTML = `<div class="space-y-2">${attemptsRes.data.map(a =>
+            `<div class="flex justify-between py-2 border-b border-brand-divider">
+                <span>${esc(a.profiles?.full_name || 'Unknown')}</span>
+                <span class="text-brand-taupe">${a.score}/${a.total} ${a.passed ? '✓' : '✗'} · ${fmtDate(a.attempted_at)}</span>
+            </div>`
+        ).join('')}</div>`;
+    } else {
+        document.getElementById('recent-quizzes').textContent = 'No quiz attempts yet.';
+    }
+}
+
+// ═══════════════════════════════════════
+// COURSES
+// ═══════════════════════════════════════
+async function loadCourses() {
+    const { data, error } = await sb.from('courses').select('*').order('course_number');
+    if (error) { console.error(error); return; }
+    courses = data || [];
+
+    const tbody = document.getElementById('courses-tbody');
+    if (courses.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-brand-taupe">No courses yet. Click "+ Add Course" to create one.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = courses.map(c => `
+        <tr>
+            <td class="font-medium">${String(c.course_number).padStart(2, '0')}</td>
+            <td>${esc(c.title)}</td>
+            <td class="text-brand-taupe text-xs">${esc(c.slug)}</td>
+            <td>${c.lesson_count || 0}</td>
+            <td class="space-x-2">
+                <button class="btn btn-sm btn-outline" onclick="showCourseForm('${c.id}')">Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteCourse('${c.id}', '${esc(c.title)}')">Delete</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function showCourseForm(editId) {
+    const existing = editId ? courses.find(c => c.id === editId) : null;
+    const title = existing ? 'Edit Course' : 'Add Course';
+
+    const body = `
+        <div>
+            <label class="form-label">Course Title</label>
+            <input type="text" name="title" class="form-input" required value="${esc(existing?.title || '')}"
+                oninput="if(!document.querySelector('[name=slug]').dataset.manual) document.querySelector('[name=slug]').value = this.value.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'')" />
+        </div>
+        <div>
+            <label class="form-label">Slug (URL path)</label>
+            <input type="text" name="slug" class="form-input" required value="${esc(existing?.slug || '')}"
+                oninput="this.dataset.manual='1'" />
+        </div>
+        <div>
+            <label class="form-label">Course Number</label>
+            <input type="number" name="course_number" class="form-input" required min="1" value="${existing?.course_number || ''}" />
+        </div>
+    `;
+
+    showModal(title, body, async () => {
+        const form = document.getElementById('modal-form');
+        const payload = {
+            title: form.title.value.trim(),
+            slug: form.slug.value.trim(),
+            course_number: parseInt(form.course_number.value),
+        };
+        if (!payload.title || !payload.slug) { modalError('Title and slug are required.'); return; }
+
+        if (existing) {
+            const { error } = await sb.from('courses').update(payload).eq('id', editId);
+            if (error) { modalError(error.message); return; }
+        } else {
+            payload.lesson_count = 0;
+            payload.total_min = 0;
+            const { error } = await sb.from('courses').insert(payload);
+            if (error) { modalError(error.message); return; }
+        }
+        closeModal();
+        loadCourses();
+    });
+}
+
+async function deleteCourse(id, title) {
+    if (!confirm(`Delete course "${title}"? This will also delete all its lessons.`)) return;
+    const { error } = await sb.from('courses').delete().eq('id', id);
+    if (error) { alert('Error: ' + error.message); return; }
+    loadCourses();
+}
+
+// ═══════════════════════════════════════
+// LESSONS
+// ═══════════════════════════════════════
+async function loadCoursesForSelect() {
+    const { data } = await sb.from('courses').select('id, title, course_number').order('course_number');
+    courses = data || [];
+    const sel = document.getElementById('lesson-course-select');
+    sel.innerHTML = '<option value="">Select a course…</option>' +
+        courses.map(c => `<option value="${c.id}" ${c.id === selectedCourseId ? 'selected' : ''}>${String(c.course_number).padStart(2, '0')} — ${esc(c.title)}</option>`).join('');
+
+    if (selectedCourseId) loadLessons(selectedCourseId);
+}
+
+document.getElementById('lesson-course-select').addEventListener('change', e => {
+    selectedCourseId = e.target.value || null;
+    document.getElementById('add-lesson-btn').disabled = !selectedCourseId;
+    if (selectedCourseId) loadLessons(selectedCourseId);
+    else document.getElementById('lessons-tbody').innerHTML = '<tr><td colspan="5" class="text-brand-taupe">Select a course above</td></tr>';
+});
+
+async function loadLessons(courseId) {
+    const { data, error } = await sb.from('lessons').select('*').eq('course_id', courseId).order('sort_order');
+    if (error) { console.error(error); return; }
+    const lessons = data || [];
+
+    const tbody = document.getElementById('lessons-tbody');
+    if (lessons.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-brand-taupe">No lessons yet. Click "+ Add Lesson" to create one.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = lessons.map(l => `
+        <tr>
+            <td class="font-medium">${String(l.lesson_number).padStart(2, '0')}</td>
+            <td>${esc(l.title)}</td>
+            <td>${l.duration_min || 0} min</td>
+            <td class="text-xs text-brand-taupe max-w-[200px] truncate">${esc(l.video_path || 'None')}</td>
+            <td class="space-x-2">
+                <button class="btn btn-sm btn-outline" onclick="showLessonForm('${l.id}')">Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteLesson('${l.id}', '${esc(l.title)}')">Delete</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function showLessonForm(editId) {
+    let existing = null;
+    if (editId) {
+        // We need to fetch the lesson
+        sb.from('lessons').select('*').eq('id', editId).single().then(({ data }) => {
+            existing = data;
+            renderLessonModal(existing);
+        });
+    } else {
+        renderLessonModal(null);
+    }
+}
+
+function renderLessonModal(existing) {
+    const title = existing ? 'Edit Lesson' : 'Add Lesson';
+    const body = `
+        <div>
+            <label class="form-label">Lesson Title</label>
+            <input type="text" name="title" class="form-input" required value="${esc(existing?.title || '')}" />
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="form-label">Lesson Number</label>
+                <input type="number" name="lesson_number" class="form-input" required min="1" value="${existing?.lesson_number || ''}" />
+            </div>
+            <div>
+                <label class="form-label">Sort Order</label>
+                <input type="number" name="sort_order" class="form-input" required min="1" value="${existing?.sort_order || ''}" />
+            </div>
+        </div>
+        <div>
+            <label class="form-label">Duration (minutes)</label>
+            <input type="number" name="duration_min" class="form-input" min="0" value="${existing?.duration_min || ''}" />
+        </div>
+        <div>
+            <label class="form-label">Video Path or YouTube URL</label>
+            <input type="text" name="video_path" class="form-input" placeholder="/videos/lesson-01.mp4 or https://youtube.com/..." value="${esc(existing?.video_path || '')}" />
+        </div>
+        <div>
+            <label class="form-label">Description</label>
+            <textarea name="description" class="form-input" rows="4" placeholder="Lesson description…">${esc(existing?.description || '')}</textarea>
+        </div>
+    `;
+
+    showModal(title, body, async () => {
+        const form = document.getElementById('modal-form');
+        const payload = {
+            title: form.title.value.trim(),
+            lesson_number: parseInt(form.lesson_number.value),
+            sort_order: parseInt(form.sort_order.value),
+            duration_min: parseInt(form.duration_min.value) || 0,
+            video_path: form.video_path.value.trim() || null,
+            description: form.description.value.trim() || null,
+        };
+        if (!payload.title) { modalError('Title is required.'); return; }
+
+        if (existing) {
+            const { error } = await sb.from('lessons').update(payload).eq('id', existing.id);
+            if (error) { modalError(error.message); return; }
+        } else {
+            payload.course_id = selectedCourseId;
+            const { error } = await sb.from('lessons').insert(payload);
+            if (error) { modalError(error.message); return; }
+        }
+        closeModal();
+        loadLessons(selectedCourseId);
+        updateCourseStats(selectedCourseId);
+    });
+}
+
+async function deleteLesson(id, title) {
+    if (!confirm(`Delete lesson "${title}"?`)) return;
+    const { error } = await sb.from('lessons').delete().eq('id', id);
+    if (error) { alert('Error: ' + error.message); return; }
+    loadLessons(selectedCourseId);
+    updateCourseStats(selectedCourseId);
+}
+
+async function updateCourseStats(courseId) {
+    const { data: lessons } = await sb.from('lessons').select('duration_min').eq('course_id', courseId);
+    if (!lessons) return;
+    const count = lessons.length;
+    const totalMin = lessons.reduce((s, l) => s + (l.duration_min || 0), 0);
+    await sb.from('courses').update({ lesson_count: count, total_min: totalMin }).eq('id', courseId);
+}
+
+// ═══════════════════════════════════════
+// STUDENTS
+// ═══════════════════════════════════════
+async function loadStudents() {
+    const [usersRes, enrollRes, profilesRes, progressRes, coursesRes] = await Promise.all([
+        sb.rpc('admin_get_users'),
+        sb.from('enrollments').select('*'),
+        sb.from('profiles').select('id, full_name'),
+        sb.from('lesson_progress').select('user_id, lesson_id'),
+        sb.from('courses').select('id, title, lesson_count'),
+    ]);
+
+    users = usersRes.data || [];
+    const allEnrollments = enrollRes.data || [];
+    const profiles = profilesRes.data || [];
+    const progress = progressRes.data || [];
+    const allCourses = coursesRes.data || [];
+
+    const profileMap = {};
+    profiles.forEach(p => profileMap[p.id] = p.full_name);
+    const courseMap = {};
+    allCourses.forEach(c => courseMap[c.id] = c);
+
+    const enrollByUser = {};
+    allEnrollments.forEach(e => {
+        if (!enrollByUser[e.user_id]) enrollByUser[e.user_id] = [];
+        enrollByUser[e.user_id].push(e);
+    });
+
+    const progressByUser = {};
+    progress.forEach(p => {
+        if (!progressByUser[p.user_id]) progressByUser[p.user_id] = 0;
+        progressByUser[p.user_id]++;
+    });
+
+    const tbody = document.getElementById('students-tbody');
+    if (users.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-brand-taupe">No students yet.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = users.map(u => {
+        const name = profileMap[u.id] || '–';
+        const userEnroll = enrollByUser[u.id] || [];
+        const courseNames = userEnroll.map(e => courseMap[e.course_id]?.title || '?').join(', ');
+        const lessonsCompleted = progressByUser[u.id] || 0;
+        return `
+            <tr>
+                <td>${esc(name)}</td>
+                <td class="text-brand-taupe">${esc(u.email)}</td>
+                <td class="text-xs">${esc(courseNames) || '<span class="text-brand-taupe">None</span>'}</td>
+                <td>${lessonsCompleted} lessons</td>
+                <td class="text-xs text-brand-taupe">${fmtDate(u.created_at)}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline" onclick="showEnrollModal('${u.id}', '${esc(u.email)}')">Enroll</button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function showEnrollModal(studentId, email) {
+    const body = `
+        <p class="text-sm text-brand-taupe mb-4">Enroll <strong>${email}</strong> in a course:</p>
+        <div>
+            <label class="form-label">Course</label>
+            <select name="course_id" class="form-input" required>
+                <option value="">Select…</option>
+                ${courses.map(c => `<option value="${c.id}">${esc(c.title)}</option>`).join('')}
+            </select>
+        </div>
+    `;
+    showModal('Enroll Student', body, async () => {
+        const courseId = document.querySelector('[name="course_id"]').value;
+        if (!courseId) { modalError('Please select a course.'); return; }
+
+        const { error } = await sb.from('enrollments').insert({ user_id: studentId, course_id: courseId });
+        if (error) {
+            if (error.code === '23505') modalError('Student is already enrolled in this course.');
+            else modalError(error.message);
+            return;
+        }
+        closeModal();
+        loadStudents();
+    });
+}
+
+// ═══════════════════════════════════════
+// QUIZ RESULTS
+// ═══════════════════════════════════════
+async function loadQuizResults() {
+    const [attemptsRes, quizzesRes, lessonsRes, profilesRes, usersRes] = await Promise.all([
+        sb.from('quiz_attempts').select('*').order('attempted_at', { ascending: false }).limit(50),
+        sb.from('quizzes').select('id, lesson_id, title'),
+        sb.from('lessons').select('id, title, course_id'),
+        sb.from('profiles').select('id, full_name'),
+        sb.rpc('admin_get_users'),
+    ]);
+
+    const attempts = attemptsRes.data || [];
+    const quizMap = {};
+    (quizzesRes.data || []).forEach(q => quizMap[q.id] = q);
+    const lessonMap = {};
+    (lessonsRes.data || []).forEach(l => lessonMap[l.id] = l);
+    const profileMap = {};
+    (profilesRes.data || []).forEach(p => profileMap[p.id] = p.full_name);
+    const userMap = {};
+    (usersRes.data || []).forEach(u => userMap[u.id] = u.email);
+
+    const tbody = document.getElementById('quizzes-tbody');
+    if (attempts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-brand-taupe">No quiz attempts yet.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = attempts.map(a => {
+        const quiz = quizMap[a.quiz_id] || {};
+        const lesson = quiz.lesson_id ? lessonMap[quiz.lesson_id] : null;
+        const name = profileMap[a.user_id] || userMap[a.user_id] || 'Unknown';
+        const pct = Math.round((a.score / a.total) * 100);
+        return `
+            <tr>
+                <td>${esc(name)}</td>
+                <td class="text-xs">${esc(lesson?.title || quiz.title || '–')}</td>
+                <td>${a.score}/${a.total} (${pct}%)</td>
+                <td><span class="inline-block px-2 py-0.5 text-xs ${a.passed ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-700'}">${a.passed ? 'Passed' : 'Failed'}</span></td>
+                <td class="text-xs text-brand-taupe">${fmtDate(a.attempted_at)}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// ═══════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════
+async function loadSettings() {
+    const keys = ['resend_api_key', 'email_from', 'site_url'];
+    for (const key of keys) {
+        const { data } = await sb.rpc('admin_get_config', { p_key: key });
+        if (data) {
+            if (key === 'resend_api_key') document.getElementById('cfg-resend-key').value = data;
+            else if (key === 'email_from') document.getElementById('cfg-email-from').value = data;
+            else if (key === 'site_url') document.getElementById('cfg-site-url').value = data;
+        }
+    }
+}
+
+document.getElementById('settings-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const msgEl = document.getElementById('settings-msg');
+    msgEl.classList.add('hidden');
+
+    const settings = {
+        resend_api_key: document.getElementById('cfg-resend-key').value.trim(),
+        email_from: document.getElementById('cfg-email-from').value.trim(),
+        site_url: document.getElementById('cfg-site-url').value.trim(),
+    };
+
+    for (const [key, value] of Object.entries(settings)) {
+        if (!value) continue;
+        const { error } = await sb.rpc('admin_set_config', { p_key: key, p_value: value });
+        if (error) {
+            msgEl.textContent = 'Error saving ' + key + ': ' + error.message;
+            msgEl.className = 'text-sm px-4 py-3 text-red-700 bg-red-50 border border-red-200';
+            msgEl.classList.remove('hidden');
+            return;
+        }
+    }
+
+    msgEl.textContent = 'Settings saved successfully.';
+    msgEl.className = 'text-sm px-4 py-3 text-green-800 bg-green-50 border border-green-200';
+    msgEl.classList.remove('hidden');
+});
+
+async function sendTestEmail() {
+    const to = document.getElementById('test-email-to').value.trim();
+    const msgEl = document.getElementById('test-email-msg');
+    const btn = document.getElementById('test-email-btn');
+    if (!to) { return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+    msgEl.classList.add('hidden');
+
+    const { error } = await sb.rpc('admin_set_config', { p_key: '_test', p_value: '_test' });
+    if (error && error.message.includes('Not authorized')) {
+        msgEl.textContent = 'Not authorized.';
+        msgEl.className = 'text-sm px-4 py-3 text-red-700 bg-red-50 border border-red-200';
+        msgEl.classList.remove('hidden');
+        btn.disabled = false;
+        btn.textContent = 'Send Test';
+        return;
+    }
+
+    const html = '<div style="font-family:Inter,Arial,sans-serif;background:#F5F3EE;padding:40px 20px"><div style="max-width:600px;margin:0 auto"><div style="text-align:center;margin-bottom:30px"><h1 style="font-family:Georgia,serif;color:#2F3E34;font-size:24px;font-weight:400;margin:0">Behind The Business</h1></div><div style="background:white;padding:40px;border:1px solid #DEDAD4"><h2 style="font-family:Georgia,serif;color:#2F3E34;font-size:28px;font-weight:400;margin:0 0 20px">Test Email</h2><p style="color:#6B6A67;line-height:1.6">If you are reading this, your email notifications are working correctly.</p></div><p style="color:#6B6A67;font-size:12px;text-align:center;margin-top:24px">Behind The Business</p></div></div>';
+
+    const { data, error: sendErr } = await sb.rpc('admin_send_test_email', { p_to: to, p_html: html });
+
+    if (sendErr) {
+        msgEl.textContent = 'Error: ' + sendErr.message;
+        msgEl.className = 'text-sm px-4 py-3 text-red-700 bg-red-50 border border-red-200';
+    } else {
+        msgEl.textContent = 'Test email sent to ' + to + '. Check your inbox (and spam folder).';
+        msgEl.className = 'text-sm px-4 py-3 text-green-800 bg-green-50 border border-green-200';
+    }
+    msgEl.classList.remove('hidden');
+    btn.disabled = false;
+    btn.textContent = 'Send Test';
+}
+</script>
+
+</body>
+</html>

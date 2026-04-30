@@ -87,7 +87,7 @@
 <body class="grain">
 
 <!-- ============================ HEADER ============================ -->
-<header class="w-full">
+<header class="w-full relative z-[55]">
     <div class="max-w-6xl mx-auto px-6 md:px-10 py-6 flex items-center justify-between">
         <a href="/" class="flex items-center gap-3">
             <img src="/btb-logo.png" alt="Behind The Business" width="40" height="40" class="block" />
@@ -102,14 +102,36 @@
             <a href="#about" class="hover:text-brand-clay transition">About</a>
         </nav>
 
-        <div class="flex items-center gap-5">
+        <div class="flex items-center gap-3 md:gap-5">
             <a href="/login.html" class="hidden md:inline-block text-sm text-brand-moss hover:text-brand-clay transition">
                 Sign in
             </a>
-            <a href="#inquire" class="inline-block bg-brand-moss text-brand-sand px-5 py-2.5 text-sm tracking-wide hover:bg-brand-clay transition">
+            <a href="#inquire" class="hidden md:inline-block bg-brand-moss text-brand-sand px-5 py-2.5 text-sm tracking-wide hover:bg-brand-clay transition">
                 Inquire About Availability
             </a>
+            <a href="#inquire" class="md:hidden inline-block bg-brand-moss text-brand-sand px-4 py-2.5 text-xs tracking-wide hover:bg-brand-clay transition">
+                Inquire
+            </a>
+            <button id="mobile-menu-btn" class="md:hidden flex flex-col gap-1.5 p-2" aria-label="Menu">
+                <span class="block w-5 h-0.5 bg-brand-moss"></span>
+                <span class="block w-5 h-0.5 bg-brand-moss"></span>
+                <span class="block w-5 h-0.5 bg-brand-moss"></span>
+            </button>
         </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full bg-brand-sand border-b border-brand-divider shadow-lg">
+        <nav class="max-w-6xl mx-auto px-6 py-6 flex flex-col gap-4 text-sm">
+            <a href="#offer" class="py-2 hover:text-brand-clay transition">How we work</a>
+            <a href="#courses" class="py-2 hover:text-brand-clay transition">Courses</a>
+            <a href="#deliverables" class="py-2 hover:text-brand-clay transition">What we own</a>
+            <a href="#fit" class="py-2 hover:text-brand-clay transition">Who it's for</a>
+            <a href="#about" class="py-2 hover:text-brand-clay transition">About</a>
+            <div class="border-t border-brand-divider pt-4 mt-2">
+                <a href="/login.html" class="block py-2 text-brand-moss hover:text-brand-clay transition">Sign in</a>
+            </div>
+        </nav>
     </div>
 </header>
 
@@ -136,7 +158,7 @@
                 </div>
             </div>
             <div>
-                <video controls preload="metadata" class="max-h-[400px] w-auto block mx-auto">
+                <video controls preload="metadata" class="w-full max-h-[400px] object-contain block mx-auto">
                     <source src="/videos/video-01.mp4" type="video/mp4">
                     Your browser does not support video playback.
                 </video>
@@ -159,7 +181,7 @@
                 </p>
             </div>
             <div>
-                <video controls preload="metadata" class="max-h-[400px] w-auto block mx-auto">
+                <video controls preload="metadata" class="w-full max-h-[400px] object-contain block mx-auto">
                     <source src="/videos/video-02.mp4" type="video/mp4">
                     Your browser does not support video playback.
                 </video>
@@ -213,7 +235,7 @@
                 </p>
             </div>
             <div>
-                <video controls preload="metadata" class="max-h-[400px] w-auto block mx-auto">
+                <video controls preload="metadata" class="w-full max-h-[400px] object-contain block mx-auto">
                     <source src="/videos/video-03.mp4" type="video/mp4">
                     Your browser does not support video playback.
                 </video>
@@ -278,7 +300,7 @@
                 </p>
             </div>
             <div>
-                <video controls preload="metadata" class="max-h-[400px] w-auto block mx-auto">
+                <video controls preload="metadata" class="w-full max-h-[400px] object-contain block mx-auto">
                     <source src="/videos/video-04.mp4" type="video/mp4">
                     Your browser does not support video playback.
                 </video>
@@ -303,8 +325,8 @@
                     <li class="flex gap-2"><span class="text-brand-clay select-none">→</span><span>The risk register — spotting where the business is one-person-deep</span></li>
                     <li class="flex gap-2"><span class="text-brand-clay select-none">→</span><span>The roadmap output — turning findings into a sequenced fix plan</span></li>
                 </ul>
-                <a href="mailto:tobey@behindthebusiness.net?subject=Waitlist%20—%20Course%2001%20The%20Systems%20Audit" class="text-sm tracking-wide text-brand-moss hover:text-brand-clay transition border-b border-brand-moss hover:border-brand-clay pb-1 self-start">
-                    Join the Waitlist →
+                <a href="/course/the-systems-audit" class="text-sm tracking-wide text-brand-moss hover:text-brand-clay transition border-b border-brand-moss hover:border-brand-clay pb-1 self-start">
+                    View Course →
                 </a>
             </article>
 
@@ -324,8 +346,8 @@
                     <li class="flex gap-2"><span class="text-brand-clay select-none">→</span><span>Data flow auditing — finding where information disappears</span></li>
                     <li class="flex gap-2"><span class="text-brand-clay select-none">→</span><span>Permission baselines — making sure the right people see the right things</span></li>
                 </ul>
-                <a href="mailto:tobey@behindthebusiness.net?subject=Waitlist%20—%20Course%2002%20Foundation" class="text-sm tracking-wide text-brand-moss hover:text-brand-clay transition border-b border-brand-moss hover:border-brand-clay pb-1 self-start">
-                    Join the Waitlist →
+                <a href="/course/foundation-structural-control" class="text-sm tracking-wide text-brand-moss hover:text-brand-clay transition border-b border-brand-moss hover:border-brand-clay pb-1 self-start">
+                    View Course →
                 </a>
             </article>
 
@@ -345,8 +367,8 @@
                     <li class="flex gap-2"><span class="text-brand-clay select-none">→</span><span>Workflow design — routing tasks, approvals, and handoffs without you in the middle</span></li>
                     <li class="flex gap-2"><span class="text-brand-clay select-none">→</span><span>Cross-tool automation — integrations that don't break when someone changes a field</span></li>
                 </ul>
-                <a href="mailto:tobey@behindthebusiness.net?subject=Waitlist%20—%20Course%2003%20Working%20Systems" class="text-sm tracking-wide text-brand-moss hover:text-brand-clay transition border-b border-brand-moss hover:border-brand-clay pb-1 self-start">
-                    Join the Waitlist →
+                <a href="/course/working-systems" class="text-sm tracking-wide text-brand-moss hover:text-brand-clay transition border-b border-brand-moss hover:border-brand-clay pb-1 self-start">
+                    View Course →
                 </a>
             </article>
 
@@ -366,8 +388,8 @@
                     <li class="flex gap-2"><span class="text-brand-clay select-none">→</span><span>Operational tracking — dashboards that show the business without asking</span></li>
                     <li class="flex gap-2"><span class="text-brand-clay select-none">→</span><span>Stewardship rituals — the cadence that prevents systems from rotting</span></li>
                 </ul>
-                <a href="mailto:tobey@behindthebusiness.net?subject=Waitlist%20—%20Course%2004%20Continuity" class="text-sm tracking-wide text-brand-moss hover:text-brand-clay transition border-b border-brand-moss hover:border-brand-clay pb-1 self-start">
-                    Join the Waitlist →
+                <a href="/course/continuity-stewardship" class="text-sm tracking-wide text-brand-moss hover:text-brand-clay transition border-b border-brand-moss hover:border-brand-clay pb-1 self-start">
+                    View Course →
                 </a>
             </article>
 
@@ -546,7 +568,7 @@
                 </p>
             </div>
             <div>
-                <video controls preload="metadata" class="max-h-[400px] w-auto block mx-auto">
+                <video controls preload="metadata" class="w-full max-h-[400px] object-contain block mx-auto">
                     <source src="/videos/video-05.mp4" type="video/mp4">
                     Your browser does not support video playback.
                 </video>
@@ -609,6 +631,15 @@
 
 <script>
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    menuBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+    mobileMenu.querySelectorAll('a').forEach(a => {
+        a.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+    });
 </script>
 
 </body>
