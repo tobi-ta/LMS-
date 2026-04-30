@@ -6,11 +6,17 @@
     <title>Course · Behind The Business</title>
     <meta name="robots" content="noindex" />
     <link rel="icon" type="image/png" href="/btb-favicon.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#2F3E34" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="apple-touch-icon" href="/btb-logo.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
     <script>
         window.tailwind.config = {
             theme: { extend: {
@@ -28,11 +34,18 @@
         .lesson-row { cursor: pointer; }
         .lesson-row.active { background-color: #F5F3EE; border-left: 3px solid #B66A4A; padding-left: 13px; }
         .lesson-row.done .lesson-num { color: #B66A4A; }
+        .btm-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #F5F3EE; border-top: 1px solid #DEDAD4; z-index: 55; display: flex; justify-content: space-around; padding: 0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom)); }
+        .btm-nav-item { display: flex; flex-direction: column; align-items: center; gap: 0.15rem; color: #6B6A67; font-size: 0.6rem; letter-spacing: 0.05em; text-decoration: none; padding: 0.4rem 1.2rem; transition: color 0.2s; }
+        .btm-nav-item.active { color: #2F3E34; }
+        @media (min-width: 1024px) { .btm-nav { display: none; } }
+        .avatar { width: 36px; height: 36px; border-radius: 50%; background-color: #2F3E34; color: #F5F3EE; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.02em; text-decoration: none; flex-shrink: 0; transition: background-color 0.2s; }
+        .avatar:hover { background-color: #B66A4A; }
+        .avatar-sm { width: 28px; height: 28px; font-size: 0.6rem; border-radius: 50%; background-color: #2F3E34; color: #F5F3EE; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; letter-spacing: 0.02em; flex-shrink: 0; }
     </style>
 </head>
-<body class="grain min-h-screen flex flex-col">
+<body class="grain min-h-screen flex flex-col pb-16 lg:pb-0">
 
-<header class="w-full border-b border-brand-divider">
+<header class="w-full border-b border-brand-divider sticky top-0 bg-brand-sand z-[55]">
     <div class="max-w-7xl mx-auto px-6 md:px-10 py-5 flex items-center justify-between">
         <div class="flex items-center gap-6">
             <a href="/dashboard" class="text-sm text-brand-taupe hover:text-brand-moss transition">
@@ -43,10 +56,13 @@
                 <span class="serif text-base tracking-tight">Behind The Business</span>
             </a>
         </div>
-        <div class="flex items-center gap-5">
-            <span id="user-email" class="hidden md:inline-block text-sm text-brand-taupe"></span>
-            <a href="#" id="signout-link" class="text-sm text-brand-moss hover:text-brand-clay transition">Sign out</a>
+        <div class="flex items-center gap-4">
+            <a href="#" id="signout-link" class="hidden md:inline-block text-sm text-brand-taupe hover:text-brand-clay transition">Sign out</a>
+            <a href="/profile" id="user-avatar" class="avatar" title="Profile"></a>
         </div>
+    </div>
+    <div class="w-full h-[3px] bg-brand-divider">
+        <div id="top-progress-bar" class="h-full bg-brand-clay transition-all duration-500 ease-out" style="width: 0%"></div>
     </div>
 </header>
 
@@ -80,16 +96,17 @@
                         <p id="lesson-description"></p>
                     </div>
 
-                    <!-- Quiz section -->
+                    <!-- Quiz section — shown only on last lesson -->
                     <div id="quiz-section" class="hidden mt-10 pt-6 border-t border-brand-divider">
-                        <p class="eyebrow mb-3">Lesson Quiz</p>
-                        <h3 id="quiz-title" class="serif text-xl mb-6"></h3>
-                        <div id="quiz-questions" class="space-y-6"></div>
-                        <div id="quiz-result" class="hidden mt-6 p-5 border border-brand-divider"></div>
-                        <button id="quiz-submit" class="mt-6 bg-brand-moss text-brand-sand px-6 py-3 text-sm tracking-wide hover:bg-brand-clay transition disabled:opacity-50 disabled:cursor-not-allowed">
-                            Submit Answers
+                        <p class="eyebrow mb-3">Course Quiz</p>
+                        <h3 class="serif text-xl mb-2">Final Assessment</h3>
+                        <p class="text-sm text-brand-taupe mb-8">Answer all questions from every lesson, then submit to check your results.</p>
+                        <div id="quiz-questions" class="space-y-10"></div>
+                        <div id="quiz-result" class="hidden mt-8 p-5 border border-brand-divider"></div>
+                        <button id="quiz-submit" class="mt-8 bg-brand-moss text-brand-sand px-6 py-3 text-sm tracking-wide hover:bg-brand-clay transition disabled:opacity-50 disabled:cursor-not-allowed">
+                            Submit All Answers
                         </button>
-                        <div id="quiz-past" class="hidden mt-4 text-xs text-brand-taupe"></div>
+                        <p id="quiz-locked-msg" class="hidden mt-3 text-sm text-brand-taupe">Complete all lessons to submit your answers.</p>
                     </div>
 
                     <!-- Discussion section -->
@@ -110,18 +127,21 @@
                         <div id="comments-list" class="space-y-4"></div>
                     </div>
 
-                    <div class="mt-10 pt-6 border-t border-brand-divider flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <div class="flex items-center gap-3">
-                            <input type="checkbox" id="complete-checkbox" class="w-4 h-4" />
-                            <label for="complete-checkbox" class="text-sm text-brand-moss">Mark this lesson complete</label>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <button id="prev-lesson" class="px-5 py-2.5 text-sm tracking-wide border border-brand-moss text-brand-moss hover:bg-brand-moss hover:text-brand-sand transition disabled:opacity-30 disabled:cursor-not-allowed">
-                                ← Previous
-                            </button>
-                            <button id="next-lesson" class="px-5 py-2.5 text-sm tracking-wide bg-brand-moss text-brand-sand hover:bg-brand-clay transition disabled:opacity-30 disabled:cursor-not-allowed">
-                                Next lesson →
-                            </button>
+                    <div class="mt-10 pt-6 border-t border-brand-divider">
+                        <p id="video-lock-msg" class="hidden text-sm text-brand-taupe bg-brand-divider/30 px-4 py-3 mb-4">Finish watching the video to mark this lesson complete and continue.</p>
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                            <div class="flex items-center gap-3">
+                                <input type="checkbox" id="complete-checkbox" class="w-4 h-4" />
+                                <label for="complete-checkbox" class="text-sm text-brand-moss">Mark this lesson complete</label>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <button id="prev-lesson" class="px-5 py-2.5 text-sm tracking-wide border border-brand-moss text-brand-moss hover:bg-brand-moss hover:text-brand-sand transition disabled:opacity-30 disabled:cursor-not-allowed">
+                                    ← Previous
+                                </button>
+                                <button id="next-lesson" class="px-5 py-2.5 text-sm tracking-wide bg-brand-moss text-brand-sand hover:bg-brand-clay transition disabled:opacity-30 disabled:cursor-not-allowed">
+                                    Next lesson →
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -152,15 +172,31 @@
     </div>
 </main>
 
-<footer class="w-full border-t border-brand-divider">
+<nav class="btm-nav lg:hidden">
+    <a href="/" class="btm-nav-item">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l9-8 9 8"/><path d="M5 10v9a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1v-9"/></svg>
+        <span>Home</span>
+    </a>
+    <a href="/dashboard" class="btm-nav-item active">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span>Courses</span>
+    </a>
+    <a href="/profile" class="btm-nav-item">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-3.3 3.1-6 7-6s7 2.7 7 6"/></svg>
+        <span>Profile</span>
+    </a>
+</nav>
+
+<footer class="w-full border-t border-brand-divider hidden lg:block">
     <div class="max-w-7xl mx-auto px-6 md:px-10 py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs text-brand-taupe">
-        <p>© <span id="year"></span> Behind The Business.</p>
+        <p>&copy; <span id="year"></span> Behind The Business.</p>
         <a href="mailto:tobey@behindthebusiness.net" class="hover:text-brand-clay transition">tobey@behindthebusiness.net</a>
     </div>
 </footer>
 
 <script>
     document.getElementById('year').textContent = new Date().getFullYear();
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
 
     const SUPABASE_URL = 'https://wjndqsqgfmbrakzcagei.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_MQ_1krNKxWTmdC4nEF4eBg_U4ZBYHha';
@@ -194,61 +230,126 @@
     }
 
     let currentVideoSrc = '';
-    function renderVideo(src) {
-        if (src === currentVideoSrc) return;
-        currentVideoSrc = src;
-        const container = document.getElementById('video-container');
-        const ytId = getYouTubeId(src);
-        if (ytId) {
-            container.innerHTML = `<iframe src="https://www.youtube.com/embed/${ytId}" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
-        } else if (src) {
-            container.innerHTML = `<video controls preload="metadata" class="w-full h-full"><source src="${escapeHtml(src)}" type="video/mp4">Your browser does not support video playback.</video>`;
+    let videoFinished = false;
+    let ytPlayer = null;
+    let ytApiReady = false;
+
+    window.onYouTubeIframeAPIReady = function () {
+        ytApiReady = true;
+    };
+
+    function onVideoEnded() {
+        videoFinished = true;
+        updateVideoLock();
+    }
+
+    function updateVideoLock() {
+        const l = currentLesson();
+        const alreadyDone = l && !!progressByLesson[l.id];
+        const unlocked = videoFinished || alreadyDone;
+
+        const checkbox = document.getElementById('complete-checkbox');
+        const nextBtn = document.getElementById('next-lesson');
+        const lockMsg = document.getElementById('video-lock-msg');
+
+        checkbox.disabled = !unlocked;
+        if (!unlocked) {
+            nextBtn.disabled = true;
+            lockMsg.classList.remove('hidden');
         } else {
-            container.innerHTML = `<p class="text-brand-sand text-sm">No video available for this lesson.</p>`;
+            const idx = lessons.findIndex(x => x.id === currentLessonId);
+            nextBtn.disabled = idx === lessons.length - 1;
+            lockMsg.classList.add('hidden');
         }
     }
 
-    let currentQuiz = null;
-    let currentQuestions = [];
+    function renderVideo(src) {
+        if (src === currentVideoSrc) return;
+        currentVideoSrc = src;
+        if (ytPlayer) { ytPlayer.destroy(); ytPlayer = null; }
+        const container = document.getElementById('video-container');
+        const ytId = getYouTubeId(src);
+        if (ytId) {
+            container.innerHTML = '<div id="yt-player-el" class="w-full h-full"></div>';
+            function createPlayer() {
+                ytPlayer = new YT.Player('yt-player-el', {
+                    videoId: ytId,
+                    width: '100%',
+                    height: '100%',
+                    playerVars: { rel: 0, modestbranding: 1 },
+                    events: {
+                        onStateChange: function (e) {
+                            if (e.data === YT.PlayerState.ENDED) onVideoEnded();
+                        }
+                    }
+                });
+            }
+            if (ytApiReady) { createPlayer(); }
+            else { const check = setInterval(() => { if (ytApiReady) { clearInterval(check); createPlayer(); } }, 200); }
+        } else if (src) {
+            container.innerHTML = `<video controls preload="metadata" class="w-full h-full"><source src="${escapeHtml(src)}" type="video/mp4">Your browser does not support video playback.</video>`;
+            container.querySelector('video').addEventListener('ended', onVideoEnded);
+        } else {
+            container.innerHTML = `<p class="text-brand-sand text-sm">No video available for this lesson.</p>`;
+            videoFinished = true;
+            updateVideoLock();
+        }
+    }
 
-    async function loadQuiz(lessonId) {
+    let allQuizData = [];
+    let quizLoaded = false;
+
+    async function loadAllQuizzes() {
+        if (quizLoaded) return;
         const section = document.getElementById('quiz-section');
         const questionsEl = document.getElementById('quiz-questions');
-        const resultEl = document.getElementById('quiz-result');
-        const submitBtn = document.getElementById('quiz-submit');
-        const pastEl = document.getElementById('quiz-past');
 
-        section.classList.add('hidden');
-        resultEl.classList.add('hidden');
-        pastEl.classList.add('hidden');
-        currentQuiz = null;
-        currentQuestions = [];
-
-        const { data: quiz } = await sb
+        const lessonIds = lessons.map(l => l.id);
+        const { data: quizzes } = await sb
             .from('quizzes')
-            .select('*')
-            .eq('lesson_id', lessonId)
-            .maybeSingle();
+            .select('*, lesson_id')
+            .in('lesson_id', lessonIds);
 
-        if (!quiz) return;
-        currentQuiz = quiz;
+        if (!quizzes || quizzes.length === 0) return;
 
+        const quizIds = quizzes.map(q => q.id);
         const { data: questions } = await sb
             .from('quiz_questions')
             .select('*, options:quiz_options(*)')
-            .eq('quiz_id', quiz.id)
+            .in('quiz_id', quizIds)
             .order('sort_order', { ascending: true });
 
         if (!questions || questions.length === 0) return;
-        currentQuestions = questions;
 
-        document.getElementById('quiz-title').textContent = quiz.title;
+        const lessonMap = {};
+        lessons.forEach(l => { lessonMap[l.id] = l; });
 
-        questionsEl.innerHTML = questions.map((q, qi) => {
-            const opts = (q.options || []).sort((a, b) => a.sort_order - b.sort_order);
-            return `
-                <div class="quiz-question" data-question-id="${q.id}">
-                    <p class="text-sm font-medium mb-3">${qi + 1}. ${escapeHtml(q.question_text)}</p>
+        const quizByLesson = {};
+        quizzes.forEach(q => { quizByLesson[q.lesson_id] = q; });
+
+        allQuizData = [];
+        let globalIdx = 0;
+        let html = '';
+
+        lessons.forEach(l => {
+            const quiz = quizByLesson[l.id];
+            if (!quiz) return;
+            const qs = questions.filter(q => q.quiz_id === quiz.id);
+            if (qs.length === 0) return;
+
+            allQuizData.push({ quiz, questions: qs, lesson: l });
+
+            const num = String(l.lesson_number).padStart(2, '0');
+            html += `<div class="mb-2">
+                <p class="eyebrow mb-2">Lesson ${num}</p>
+                <h4 class="serif text-lg mb-4">${escapeHtml(l.title)}</h4>
+                <div class="space-y-4">`;
+
+            qs.forEach(q => {
+                globalIdx++;
+                const opts = (q.options || []).sort((a, b) => a.sort_order - b.sort_order);
+                html += `<div class="quiz-question" data-question-id="${q.id}">
+                    <p class="text-sm font-medium mb-3">${globalIdx}. ${escapeHtml(q.question_text)}</p>
                     <div class="space-y-2">
                         ${opts.map(o => `
                             <label class="flex items-start gap-3 px-4 py-3 border border-brand-divider bg-white cursor-pointer hover:border-brand-clay transition quiz-option" data-option-id="${o.id}">
@@ -257,48 +358,61 @@
                             </label>
                         `).join('')}
                     </div>
-                </div>
-            `;
-        }).join('');
+                </div>`;
+            });
 
-        // Show past attempts
-        const { data: attempts } = await sb
-            .from('quiz_attempts')
-            .select('score, total, passed, attempted_at')
-            .eq('quiz_id', quiz.id)
-            .order('attempted_at', { ascending: false })
-            .limit(1);
+            html += `</div></div>`;
+        });
 
-        if (attempts && attempts.length > 0) {
-            const a = attempts[0];
-            const pct = Math.round((a.score / a.total) * 100);
-            const date = new Date(a.attempted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-            pastEl.textContent = `Last attempt: ${a.score}/${a.total} (${pct}%) on ${date} — ${a.passed ? 'Passed' : 'Not passed'}`;
-            pastEl.classList.remove('hidden');
-        }
-
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Submit Answers';
+        questionsEl.innerHTML = html;
+        quizLoaded = true;
+        updateQuizLock();
         section.classList.remove('hidden');
     }
 
+    function showQuizSection() {
+        const section = document.getElementById('quiz-section');
+        const isLastLesson = currentLessonId === lessons[lessons.length - 1].id;
+        if (isLastLesson) {
+            loadAllQuizzes();
+        } else {
+            section.classList.add('hidden');
+        }
+    }
+
+    function updateQuizLock() {
+        const submitBtn = document.getElementById('quiz-submit');
+        const lockedMsg = document.getElementById('quiz-locked-msg');
+        const allDone = completedCount() === lessons.length;
+        if (allDone) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit All Answers';
+            lockedMsg.classList.add('hidden');
+        } else {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submit All Answers';
+            lockedMsg.classList.remove('hidden');
+        }
+    }
+
     document.getElementById('quiz-submit').addEventListener('click', async () => {
-        if (!currentQuiz || currentQuestions.length === 0) return;
+        if (allQuizData.length === 0) return;
+        if (completedCount() !== lessons.length) return;
         const submitBtn = document.getElementById('quiz-submit');
         const resultEl = document.getElementById('quiz-result');
 
+        const allQuestions = allQuizData.flatMap(d => d.questions);
         let score = 0;
-        const total = currentQuestions.length;
+        const total = allQuestions.length;
         let allAnswered = true;
 
-        currentQuestions.forEach(q => {
+        allQuestions.forEach(q => {
             const selected = document.querySelector(`input[name="q-${q.id}"]:checked`);
             if (!selected) { allAnswered = false; return; }
             const selectedId = selected.value;
             const correct = (q.options || []).find(o => o.is_correct);
             const questionEl = document.querySelector(`[data-question-id="${q.id}"]`);
 
-            // Highlight answers
             questionEl.querySelectorAll('.quiz-option').forEach(opt => {
                 const optId = opt.getAttribute('data-option-id');
                 if (correct && optId === correct.id) {
@@ -317,30 +431,38 @@
             return;
         }
 
-        // Disable inputs
         document.querySelectorAll('#quiz-questions input[type="radio"]').forEach(r => r.disabled = true);
         submitBtn.disabled = true;
         submitBtn.textContent = 'Submitted';
 
         const pct = Math.round((score / total) * 100);
-        const passed = pct >= currentQuiz.passing_score;
 
-        // Save attempt
-        await sb.from('quiz_attempts').insert({
-            user_id: userId,
-            quiz_id: currentQuiz.id,
-            score,
-            total,
-            passed
-        });
+        // Save one attempt per quiz
+        for (const d of allQuizData) {
+            const qs = d.questions;
+            let qScore = 0;
+            qs.forEach(q => {
+                const sel = document.querySelector(`input[name="q-${q.id}"]:checked`);
+                const correct = (q.options || []).find(o => o.is_correct);
+                if (sel && correct && sel.value === correct.id) qScore++;
+            });
+            const qPct = Math.round((qScore / qs.length) * 100);
+            await sb.from('quiz_attempts').insert({
+                user_id: userId,
+                quiz_id: d.quiz.id,
+                score: qScore,
+                total: qs.length,
+                passed: qPct >= d.quiz.passing_score
+            });
+        }
 
-        const color = passed ? 'green' : 'red';
+        const passed = pct >= 70;
         resultEl.innerHTML = `
             <p class="text-lg font-medium ${passed ? 'text-green-800' : 'text-red-700'} mb-1">
                 ${passed ? 'Passed!' : 'Not quite.'} ${score}/${total} correct (${pct}%)
             </p>
             <p class="text-sm text-brand-taupe">
-                ${passed ? 'Great work — you\'ve demonstrated understanding of this lesson.' : `You need ${currentQuiz.passing_score}% to pass. Review the lesson and try again.`}
+                ${passed ? 'Great work — you\'ve demonstrated understanding of this course.' : 'Review the lessons and try again. You need 70% to pass.'}
             </p>
         `;
         resultEl.classList.remove('hidden');
@@ -386,7 +508,15 @@
             return;
         }
         userId = session.user.id;
-        document.getElementById('user-email').textContent = session.user.email;
+        const userEmail = session.user.email;
+
+        const { data: userProfile } = await sb.from('profiles').select('full_name').eq('id', userId).maybeSingle();
+        const userName = (userProfile && userProfile.full_name) ? userProfile.full_name : '';
+        const initials = userName
+            ? userName.split(' ').filter(Boolean).map(w => w[0]).slice(0, 2).join('').toUpperCase()
+            : userEmail.substring(0, 2).toUpperCase();
+        document.getElementById('user-avatar').textContent = initials;
+        document.getElementById('user-avatar').title = userName || userEmail;
 
         const { data: courseData, error: courseError } = await sb
             .from('courses')
@@ -474,6 +604,7 @@
         document.getElementById('sidebar-progress-text-mobile').textContent =
             `${done} of ${total} lessons complete · ${pct}%`;
         document.getElementById('sidebar-progress-bar').style.width = pct + '%';
+        document.getElementById('top-progress-bar').style.width = pct + '%';
     }
 
     function renderSidebar() {
@@ -516,14 +647,18 @@
         document.getElementById('lesson-eyebrow').textContent = `Lesson ${num}`;
         document.getElementById('lesson-title').textContent = l.title;
         document.getElementById('lesson-description').textContent = l.description || '';
+
+        videoFinished = !!progressByLesson[l.id];
+        currentVideoSrc = '';
         renderVideo(l.video_path || '');
+
         const checkbox = document.getElementById('complete-checkbox');
         checkbox.checked = !!progressByLesson[l.id];
 
         const idx = lessons.indexOf(l);
         document.getElementById('prev-lesson').disabled = idx === 0;
-        document.getElementById('next-lesson').disabled = idx === lessons.length - 1;
-        loadQuiz(l.id);
+        updateVideoLock();
+        showQuizSection();
         loadComments(l.id);
         cancelReply();
     }
@@ -546,6 +681,7 @@
             }
             renderProgress();
             renderSidebar();
+            updateQuizLock();
         } finally {
             e.target.disabled = false;
         }
@@ -642,6 +778,10 @@
         document.getElementById('comments-list').innerHTML = topLevel.map(c => renderComment(c, replyMap[c.id] || [])).join('');
     }
 
+    function getInitials(name) {
+        return name.split(' ').filter(Boolean).map(w => w[0]).slice(0, 2).join('').toUpperCase() || '?';
+    }
+
     function renderComment(c, replies) {
         const name = profileCache[c.user_id] || 'Student';
         const isOwn = c.user_id === userId;
@@ -650,16 +790,18 @@
             const rIsOwn = r.user_id === userId;
             return `<div class="ml-6 mt-3 pl-4 border-l-2 border-brand-divider">
                 <div class="flex items-center gap-2 mb-1">
+                    <span class="avatar-sm">${getInitials(rName)}</span>
                     <span class="text-sm font-medium">${escapeHtml(rName)}</span>
                     <span class="text-xs text-brand-taupe">${timeAgo(r.created_at)}</span>
                     ${rIsOwn ? `<button onclick="deleteComment('${r.id}')" class="text-xs text-red-500 hover:text-red-700 ml-auto">Delete</button>` : ''}
                 </div>
-                <p class="text-sm text-brand-taupe leading-relaxed">${escapeHtml(r.content)}</p>
+                <p class="text-sm text-brand-taupe leading-relaxed ml-9">${escapeHtml(r.content)}</p>
             </div>`;
         }).join('');
 
         return `<div class="p-4 border border-brand-divider bg-white">
             <div class="flex items-center gap-2 mb-2">
+                <span class="avatar-sm">${getInitials(name)}</span>
                 <span class="text-sm font-medium">${escapeHtml(name)}</span>
                 <span class="text-xs text-brand-taupe">${timeAgo(c.created_at)}</span>
                 <div class="ml-auto flex items-center gap-3">
@@ -667,7 +809,7 @@
                     ${isOwn ? `<button onclick="deleteComment('${c.id}')" class="text-xs text-red-500 hover:text-red-700">Delete</button>` : ''}
                 </div>
             </div>
-            <p class="text-sm text-brand-taupe leading-relaxed">${escapeHtml(c.content)}</p>
+            <p class="text-sm text-brand-taupe leading-relaxed ml-9">${escapeHtml(c.content)}</p>
             ${replyHtml}
         </div>`;
     }

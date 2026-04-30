@@ -6,6 +6,11 @@
     <title>My Courses · Behind The Business</title>
     <meta name="robots" content="noindex" />
     <link rel="icon" type="image/png" href="/btb-favicon.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#2F3E34" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="apple-touch-icon" href="/btb-logo.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -25,55 +30,99 @@
         h1, h2, h3, h4, .serif { font-family: 'Playfair Display', serif; font-weight: 400; color: #2F3E34; }
         .grain::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; opacity: 0.03; background-image: url("https://grainy-gradients.vercel.app/noise.svg"); }
         .eyebrow { font-family: 'Inter', sans-serif; text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.75rem; font-weight: 500; color: #B66A4A; }
+        .skeleton { background: linear-gradient(90deg, #DEDAD4 25%, #E8E5DF 50%, #DEDAD4 75%); background-size: 200% 100%; animation: shimmer 1.5s ease-in-out infinite; border-radius: 2px; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .btm-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #F5F3EE; border-top: 1px solid #DEDAD4; z-index: 55; display: flex; justify-content: space-around; padding: 0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom)); }
+        .btm-nav-item { display: flex; flex-direction: column; align-items: center; gap: 0.15rem; color: #6B6A67; font-size: 0.6rem; letter-spacing: 0.05em; text-decoration: none; padding: 0.4rem 1.2rem; transition: color 0.2s; }
+        .btm-nav-item.active { color: #B66A4A; }
+        @media (min-width: 1024px) { .btm-nav { display: none; } }
+        .avatar { width: 36px; height: 36px; border-radius: 50%; background-color: #2F3E34; color: #F5F3EE; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.02em; text-decoration: none; transition: background-color 0.2s; }
+        .avatar:hover { background-color: #B66A4A; }
+        .progress-ring { transform: rotate(-90deg); }
+        .progress-ring__bg { fill: none; stroke: #DEDAD4; stroke-width: 3; }
+        .progress-ring__fill { fill: none; stroke: #B66A4A; stroke-width: 3; stroke-linecap: round; transition: stroke-dashoffset 0.6s ease; }
     </style>
 </head>
-<body class="grain min-h-screen flex flex-col">
+<body class="grain min-h-screen flex flex-col pb-16 lg:pb-0">
 
-<header class="w-full">
-    <div class="max-w-6xl mx-auto px-6 md:px-10 py-6 flex items-center justify-between">
+<header class="w-full sticky top-0 bg-brand-moss z-[55]" id="main-header">
+    <div class="max-w-6xl mx-auto px-6 md:px-10 py-5 flex items-center justify-between">
         <a href="/" class="flex items-center gap-3">
-            <img src="/btb-logo.png" alt="Behind The Business" width="40" height="40" />
-            <span class="serif text-lg md:text-xl tracking-tight">Behind The Business</span>
+            <img src="/btb-logo.png" alt="Behind The Business" width="36" height="36" />
+            <span class="serif text-lg md:text-xl tracking-tight" style="color: #F5F3EE;">Behind The Business</span>
         </a>
-        <div class="flex items-center gap-5">
-            <span id="user-email" class="hidden md:inline-block text-sm text-brand-taupe"></span>
-            <a href="/profile" class="text-sm text-brand-taupe hover:text-brand-clay transition">Profile</a>
-            <a href="/admin" id="admin-link" class="hidden text-sm text-brand-clay hover:text-brand-moss transition">Admin</a>
-            <a href="#" id="signout-link" class="text-sm text-brand-moss hover:text-brand-clay transition">Sign out</a>
+        <div class="flex items-center gap-4">
+            <a href="/admin" id="admin-link" class="hidden text-sm text-brand-clay hover:text-brand-sand transition">Admin</a>
+            <a href="#" id="signout-link" class="hidden md:inline-block text-sm hover:text-brand-clay transition" style="color: rgba(245,243,238,0.6);">Sign out</a>
+            <a href="/profile" id="user-avatar" class="avatar" title="Profile" style="background-color: #B66A4A; color: #F5F3EE;"></a>
         </div>
     </div>
 </header>
 
 <main class="flex-1">
-    <div class="max-w-6xl mx-auto px-6 md:px-10 py-12 md:py-20">
-        <p class="eyebrow mb-4">My courses</p>
-        <h1 class="serif text-4xl md:text-5xl mb-3">Welcome back<span id="user-name-greeting"></span>.</h1>
-        <p class="text-lg text-brand-taupe mb-12 max-w-2xl">Pick up where you left off, or start something new.</p>
+    <div class="bg-brand-moss">
+        <div class="max-w-6xl mx-auto px-6 md:px-10 pt-10 pb-12 md:pt-14 md:pb-16">
+            <p class="eyebrow mb-3">My courses</p>
+            <h1 class="serif text-3xl md:text-4xl mb-2" style="color: #F5F3EE;">Welcome back<span id="user-name-greeting"></span>.</h1>
+            <p class="text-sm max-w-xl" style="color: rgba(245,243,238,0.65);">Pick up where you left off, or start something new.</p>
+        </div>
+    </div>
+    <div class="max-w-6xl mx-auto px-6 md:px-10 py-10 md:py-14">
 
-        <div id="courses-list" class="space-y-5">
-            <p class="text-sm text-brand-taupe">Loading your courses…</p>
+        <div id="courses-list" class="space-y-4">
+            <div class="border border-brand-divider bg-brand-sand p-6 md:p-8">
+                <div class="skeleton h-3 w-28 mb-3"></div>
+                <div class="skeleton h-6 w-56 mb-2"></div>
+                <div class="skeleton h-3 w-40 mb-5"></div>
+                <div class="skeleton h-1 w-full mb-3"></div>
+                <div class="skeleton h-3 w-20"></div>
+            </div>
+            <div class="border border-brand-divider bg-brand-sand p-6 md:p-8">
+                <div class="skeleton h-3 w-32 mb-3"></div>
+                <div class="skeleton h-6 w-48 mb-2"></div>
+                <div class="skeleton h-3 w-36 mb-5"></div>
+                <div class="skeleton h-1 w-full mb-3"></div>
+                <div class="skeleton h-3 w-24"></div>
+            </div>
         </div>
 
         </div>
 
-        <div class="mt-16 pt-8 border-t border-brand-divider">
-            <h2 class="serif text-2xl mb-4">Your certificates</h2>
+        <div class="mt-12 pt-8 border-t border-brand-divider">
+            <h2 class="serif text-2xl mb-1">Your certificates</h2>
+            <p class="text-xs text-brand-taupe mb-5">Complete a course quiz to earn yours.</p>
             <div id="certificates-list">
-                <p class="text-sm text-brand-taupe">Loading certificates…</p>
+                <div class="skeleton h-4 w-48"></div>
             </div>
         </div>
 
     </div>
 </main>
 
-<footer class="w-full border-t border-brand-divider">
-    <div class="max-w-6xl mx-auto px-6 md:px-10 py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs text-brand-taupe">
-        <p>© <span id="year"></span> Behind The Business.</p>
+<nav class="btm-nav lg:hidden">
+    <a href="/" class="btm-nav-item">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12l9-8 9 8"/><path d="M5 10v9a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1v-9"/></svg>
+        <span>Home</span>
+    </a>
+    <a href="/dashboard" class="btm-nav-item active">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span>Courses</span>
+    </a>
+    <a href="/profile" class="btm-nav-item">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-3.3 3.1-6 7-6s7 2.7 7 6"/></svg>
+        <span>Profile</span>
+    </a>
+</nav>
+
+<footer class="w-full bg-brand-moss hidden lg:block">
+    <div class="max-w-6xl mx-auto px-6 md:px-10 py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs" style="color: rgba(245,243,238,0.4);">
+        <p>&copy; <span id="year"></span> Behind The Business.</p>
         <a href="mailto:tobey@behindthebusiness.net" class="hover:text-brand-clay transition">tobey@behindthebusiness.net</a>
     </div>
 </footer>
 <script>
     document.getElementById('year').textContent = new Date().getFullYear();
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
 
     const SUPABASE_URL = 'https://wjndqsqgfmbrakzcagei.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_MQ_1krNKxWTmdC4nEF4eBg_U4ZBYHha';
@@ -86,12 +135,18 @@
             return;
         }
         const email = session.user.email;
-        document.getElementById('user-email').textContent = email;
 
         const { data: profile } = await sb.from('profiles').select('full_name, is_admin').eq('id', session.user.id).maybeSingle();
         if (profile && profile.is_admin) document.getElementById('admin-link').classList.remove('hidden');
-        const displayName = (profile && profile.full_name) ? profile.full_name.split(' ')[0] : (email.split('@')[0] || '').replace(/[._-]/g, ' ');
+        const fullName = (profile && profile.full_name) ? profile.full_name : '';
+        const displayName = fullName ? fullName.split(' ')[0] : (email.split('@')[0] || '').replace(/[._-]/g, ' ');
         document.getElementById('user-name-greeting').textContent = ', ' + displayName;
+
+        const initials = fullName
+            ? fullName.split(' ').filter(Boolean).map(w => w[0]).slice(0, 2).join('').toUpperCase()
+            : email.substring(0, 2).toUpperCase();
+        document.getElementById('user-avatar').textContent = initials;
+        document.getElementById('user-avatar').title = fullName || email;
 
         await Promise.all([loadCourses(), loadCertificates()]);
     })();
@@ -138,23 +193,31 @@
             const status = progress === 0 ? 'Not started' : progress === 100 ? 'Complete' : 'In progress';
             const cta = progress === 0 ? 'Start course →' : progress === 100 ? 'Review →' : 'Continue learning →';
             const href = `/courses/${c.slug}`;
-            const progressLabel = progress === 0
-                ? '0% complete'
-                : `${completed} of ${c.lesson_count} lessons · ${progress}% complete`;
+
+            const radius = 30;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference - (progress / 100) * circumference;
+            const ringColor = progress === 100 ? '#2F3E34' : '#B66A4A';
+
+            const borderColor = progress === 100 ? '#2F3E34' : '#B66A4A';
             return `
-                <a href="${href}" class="block border border-brand-divider bg-brand-sand p-6 md:p-8 hover:border-brand-moss transition">
-                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-                        <div class="flex-1">
-                            <p class="eyebrow mb-2">Course ${courseNum} · ${status}</p>
-                            <h3 class="serif text-2xl mb-1">${escapeHtml(c.title)}</h3>
-                            <p class="text-sm text-brand-taupe">${lessonText}</p>
+                <a href="${href}" class="block border border-brand-divider bg-brand-sand p-6 md:p-8 hover:bg-white hover:border-brand-moss transition" style="border-left: 4px solid ${borderColor};">
+                    <div class="flex items-center gap-5 md:gap-8">
+                        <div class="flex-shrink-0 relative" style="width:72px;height:72px;">
+                            <svg class="progress-ring" width="72" height="72" viewBox="0 0 72 72">
+                                <circle class="progress-ring__bg" cx="36" cy="36" r="${radius}" />
+                                <circle class="progress-ring__fill" cx="36" cy="36" r="${radius}"
+                                    stroke="${ringColor}"
+                                    stroke-dasharray="${circumference}"
+                                    stroke-dashoffset="${offset}" />
+                            </svg>
+                            <span class="absolute inset-0 flex items-center justify-center text-sm font-semibold" style="color:${ringColor}">${progress}%</span>
                         </div>
-                        <div class="md:min-w-[240px] md:text-right">
-                            <p class="text-xs text-brand-taupe mb-2">${progressLabel}</p>
-                            <div class="w-full md:w-56 md:ml-auto h-1 bg-brand-divider overflow-hidden mb-3">
-                                <div class="h-full bg-brand-clay" style="width: ${progress}%"></div>
-                            </div>
-                            <span class="text-sm text-brand-moss">${cta}</span>
+                        <div class="flex-1 min-w-0">
+                            <p class="eyebrow mb-1">Course ${courseNum} · ${status}</p>
+                            <h3 class="serif text-xl md:text-2xl mb-1">${escapeHtml(c.title)}</h3>
+                            <p class="text-sm text-brand-taupe mb-2">${lessonText}</p>
+                            <span class="text-sm text-brand-clay font-medium">${cta}</span>
                         </div>
                     </div>
                 </a>
@@ -186,11 +249,11 @@
                 year: 'numeric', month: 'long', day: 'numeric'
             });
             return `
-                <a href="/certificate?id=${c.id}" class="block border border-brand-divider bg-brand-sand p-6 hover:border-brand-moss transition">
+                <a href="/certificate?id=${c.id}" class="block border border-brand-divider bg-brand-moss p-6 hover:bg-brand-clay transition" style="border-left: 4px solid #B66A4A;">
                     <p class="eyebrow mb-2">Course ${courseNum} · Certificate</p>
-                    <h3 class="serif text-xl mb-2">${escapeHtml(c.course.title)}</h3>
-                    <p class="text-xs text-brand-taupe mb-1">${c.certificate_number}</p>
-                    <p class="text-xs text-brand-taupe">Issued ${date}</p>
+                    <h3 class="serif text-xl mb-2" style="color: #F5F3EE;">${escapeHtml(c.course.title)}</h3>
+                    <p class="text-xs mb-1" style="color: rgba(245,243,238,0.5);">${c.certificate_number}</p>
+                    <p class="text-xs" style="color: rgba(245,243,238,0.5);">Issued ${date}</p>
                 </a>
             `;
         }).join('') + '</div>';

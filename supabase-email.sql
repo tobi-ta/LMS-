@@ -11,8 +11,9 @@ CREATE TABLE IF NOT EXISTS app_config (
 ALTER TABLE app_config ENABLE ROW LEVEL SECURITY;
 
 -- 3. Store email settings
+-- IMPORTANT: Do NOT put your Resend API key here.
+-- Set it via the Admin Panel → Settings tab instead.
 INSERT INTO app_config (key, value) VALUES
-  ('resend_api_key', 're_MoeX8ibn_DduAFGrMd8Jt5Mxk64Gyk4az'),
   ('email_from', 'Behind The Business <onboarding@resend.dev>'),
   ('site_url', 'https://lsm-rho.vercel.app')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;
