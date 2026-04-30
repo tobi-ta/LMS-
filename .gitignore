@@ -7,17 +7,7 @@
 
 # Scrape leftovers at repo root (the site itself lives in extracted/)
 /*.zip
-/*.mp4
 /*.webp
-
-# Videos — kept local for practice, never published
-videos/
-extracted/videos/
-*.mp4
-*.mov
-*.webm
-*.m4v
-*.mkv
 
 # Node / build
 node_modules/
