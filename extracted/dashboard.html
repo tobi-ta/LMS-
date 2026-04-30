@@ -56,7 +56,9 @@
 
         <div class="mt-16 pt-8 border-t border-brand-divider">
             <h2 class="serif text-2xl mb-4">Your certificates</h2>
-            <p class="text-sm text-brand-taupe">Complete a course to earn a certificate. Yours will appear here.</p>
+            <div id="certificates-list">
+                <p class="text-sm text-brand-taupe">Loading certificates…</p>
+            </div>
         </div>
 
     </div>
@@ -85,7 +87,7 @@
         document.getElementById('user-email').textContent = email;
         const greetingName = ', ' + (email.split('@')[0] || '').replace(/[._-]/g, ' ');
         document.getElementById('user-name-greeting').textContent = greetingName;
-        await loadCourses();
+        await Promise.all([loadCourses(), loadCertificates()]);
     })();
 
     async function loadCourses() {
@@ -152,6 +154,40 @@
                 </a>
             `;
         }).join('');
+    }
+
+    async function loadCertificates() {
+        const container = document.getElementById('certificates-list');
+        const { data: certs, error } = await sb
+            .from('certificates')
+            .select('id, certificate_number, issued_at, course:courses (title, course_number)')
+            .order('issued_at', { ascending: true });
+
+        if (error) {
+            console.error('Failed to fetch certificates:', error);
+            container.innerHTML = '<p class="text-sm text-brand-taupe">Complete a course to earn a certificate. Yours will appear here.</p>';
+            return;
+        }
+
+        if (!certs || certs.length === 0) {
+            container.innerHTML = '<p class="text-sm text-brand-taupe">Complete a course to earn a certificate. Yours will appear here.</p>';
+            return;
+        }
+
+        container.innerHTML = '<div class="grid md:grid-cols-2 gap-5">' + certs.map(c => {
+            const courseNum = String(c.course.course_number).padStart(2, '0');
+            const date = new Date(c.issued_at).toLocaleDateString('en-US', {
+                year: 'numeric', month: 'long', day: 'numeric'
+            });
+            return `
+                <a href="/certificate?id=${c.id}" class="block border border-brand-divider bg-brand-sand p-6 hover:border-brand-moss transition">
+                    <p class="eyebrow mb-2">Course ${courseNum} · Certificate</p>
+                    <h3 class="serif text-xl mb-2">${escapeHtml(c.course.title)}</h3>
+                    <p class="text-xs text-brand-taupe mb-1">${c.certificate_number}</p>
+                    <p class="text-xs text-brand-taupe">Issued ${date}</p>
+                </a>
+            `;
+        }).join('') + '</div>';
     }
 
     function escapeHtml(s) {

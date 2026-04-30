@@ -7,6 +7,7 @@
     { "handle": "filesystem" },
     { "src": "/login", "dest": "/login.html" },
     { "src": "/dashboard", "dest": "/dashboard.html" },
+    { "src": "/certificate", "dest": "/certificate.html" },
     { "src": "/courses/([^/]+)", "dest": "/course-player.html" }
   ]
 }

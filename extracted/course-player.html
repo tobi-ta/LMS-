@@ -154,6 +154,39 @@
         return String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
     }
 
+    async function issueCertificate() {
+        const { data: existing } = await sb.from('certificates')
+            .select('id').eq('user_id', userId).eq('course_id', course.id).maybeSingle();
+        if (existing) return;
+        const { data: cert, error } = await sb.from('certificates')
+            .insert({ user_id: userId, course_id: course.id })
+            .select('id, certificate_number').single();
+        if (error) { console.error('Certificate issue failed:', error); return; }
+        showCertificateModal(cert);
+    }
+
+    function showCertificateModal(cert) {
+        const overlay = document.createElement('div');
+        overlay.className = 'fixed inset-0 z-[60] flex items-center justify-center bg-black/50';
+        overlay.innerHTML = `
+            <div class="bg-brand-sand max-w-md mx-4 p-8 md:p-10 text-center">
+                <p class="eyebrow mb-3">Congratulations!</p>
+                <h3 class="serif text-2xl md:text-3xl mb-4" style="color:#2F3E34">You've completed this course</h3>
+                <p class="text-brand-taupe mb-2">Certificate number</p>
+                <p class="text-lg font-medium text-brand-moss mb-6">${escapeHtml(cert.certificate_number)}</p>
+                <div class="flex flex-col gap-3">
+                    <a href="/certificate?id=${cert.id}" class="block bg-brand-moss text-brand-sand px-6 py-3 text-sm tracking-wide hover:bg-brand-clay transition">
+                        View Certificate
+                    </a>
+                    <button onclick="this.closest('.fixed').remove()" class="block px-6 py-3 text-sm tracking-wide border border-brand-moss text-brand-moss hover:bg-brand-moss hover:text-brand-sand transition">
+                        Continue Learning
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+    }
+
     (async () => {
         const { data: { session } } = await sb.auth.getSession();
         if (!session) {
@@ -314,6 +347,7 @@
                 const { error } = await sb.from('lesson_progress').insert({ user_id: userId, lesson_id: l.id });
                 if (error) { console.error(error); e.target.checked = false; return; }
                 progressByLesson[l.id] = new Date().toISOString();
+                if (completedCount() === lessons.length) await issueCertificate();
             } else {
                 const { error } = await sb.from('lesson_progress').delete().eq('lesson_id', l.id).eq('user_id', userId);
                 if (error) { console.error(error); e.target.checked = true; return; }
